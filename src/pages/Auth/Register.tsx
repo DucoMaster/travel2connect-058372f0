@@ -71,6 +71,11 @@ const Register = () => {
     }
   };
 
+  const handleRoleSelect = (role: UserRole) => {
+    console.log('Selected role:', role);
+    setUserRole(role);
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-travel-100 to-travel-200 p-4">
       <div className="w-full max-w-md">
@@ -121,14 +126,17 @@ const Register = () => {
                 
                 <div className="space-y-2">
                   <Label>I am a:</Label>
-                  <RadioGroup value={userRole} onValueChange={(value) => setUserRole(value as UserRole)}>
+                  <RadioGroup 
+                    value={userRole} 
+                    onValueChange={(value) => handleRoleSelect(value as UserRole)}
+                  >
                     <div className="grid grid-cols-1 gap-3 mt-2">
                       <UserRoleCard 
                         role="traveler"
                         title="Traveler"
                         description="I want to discover and book travel experiences"
                         isSelected={userRole === 'traveler'}
-                        onSelect={() => setUserRole('traveler')}
+                        onSelect={() => handleRoleSelect('traveler')}
                       />
                       
                       <UserRoleCard 
@@ -136,7 +144,7 @@ const Register = () => {
                         title="Travel Guide"
                         description="I want to offer my services as a local guide"
                         isSelected={userRole === 'guide'}
-                        onSelect={() => setUserRole('guide')}
+                        onSelect={() => handleRoleSelect('guide')}
                       />
                       
                       <UserRoleCard 
@@ -144,7 +152,7 @@ const Register = () => {
                         title="Travel Agent"
                         description="I want to create and publish tour packages"
                         isSelected={userRole === 'agent'}
-                        onSelect={() => setUserRole('agent')}
+                        onSelect={() => handleRoleSelect('agent')}
                       />
                       
                       <UserRoleCard 
@@ -152,7 +160,7 @@ const Register = () => {
                         title="Venue"
                         description="I represent a club, restaurant or venue"
                         isSelected={userRole === 'venue'}
-                        onSelect={() => setUserRole('venue')}
+                        onSelect={() => handleRoleSelect('venue')}
                       />
                     </div>
                   </RadioGroup>
