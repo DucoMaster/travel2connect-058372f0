@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useUser } from '@/context/UserContext';
 import { useToast } from '@/hooks/use-toast';
 
@@ -23,7 +22,7 @@ const UserRoleCard = ({ role, title, description, isSelected, onSelect }: {
     }`}
     onClick={onSelect}
   >
-    <RadioGroupItem value={role} id={role} className="sr-only" />
+    {/* Remove RadioGroupItem completely as we're no longer using RadioGroup */}
     <div className="font-medium mb-1">{title}</div>
     <div className="text-sm text-gray-600">{description}</div>
   </div>
