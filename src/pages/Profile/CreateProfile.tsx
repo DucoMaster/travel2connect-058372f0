@@ -217,10 +217,26 @@ const CreateProfile = () => {
   };
 
   const handleSubmit = async () => {
-    if (!name || !location || !selectedImage || !editedDescription) {
+    // More detailed validation with specific error messages
+    const errors: string[] = [];
+
+    if (!name) errors.push("Name is required");
+    if (!location) errors.push("Location is required");
+    if (!selectedImage) errors.push("Please select a profile image");
+    if (!editedDescription) errors.push("Profile description is required");
+    
+    // Check role-specific questions are answered
+    const unansweredQuestions = roleSpecificQuestions.filter(
+      (_, index) => !questionAnswers[index]
+    );
+    if (unansweredQuestions.length > 2) {
+      errors.push(`Please answer at least ${roleSpecificQuestions.length - 2} questions`);
+    }
+
+    if (errors.length > 0) {
       toast({
         title: 'Incomplete profile',
-        description: 'Please complete all required fields.',
+        description: errors.map(e => `• ${e}`).join('\n'),
         variant: 'destructive',
       });
       return;
@@ -514,3 +530,4 @@ const CreateProfile = () => {
 };
 
 export default CreateProfile;
+
