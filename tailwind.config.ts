@@ -28,6 +28,30 @@ export default {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'
 				},
+				travel: {
+					50: '#e6f9fa',
+					100: '#ccf3f5',
+					200: '#99e8eb',
+					300: '#66dce0',
+					400: '#33d0d6',
+					500: '#00c4cb', // primary teal
+					600: '#009da3',
+					700: '#00767a',
+					800: '#004e52',
+					900: '#002729',
+				},
+				coral: {
+					50: '#fff0ed',
+					100: '#ffe1db',
+					200: '#ffc3b7',
+					300: '#ffa693',
+					400: '#ff886f',
+					500: '#ff6a4b', // accent coral
+					600: '#cc553c',
+					700: '#99402d',
+					800: '#662a1e',
+					900: '#33150f',
+				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
 					foreground: 'hsl(var(--secondary-foreground))'
