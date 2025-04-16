@@ -71,9 +71,11 @@ const Register = () => {
     }
   };
 
+  // Fix the role selection function to properly handle venue selection
   const handleRoleSelect = (role: UserRole) => {
-    console.log('Selected role:', role);
+    // Set the role directly without additional processing that might cause hanging
     setUserRole(role);
+    console.log('Selected role:', role);
   };
 
   return (
@@ -126,44 +128,39 @@ const Register = () => {
                 
                 <div className="space-y-2">
                   <Label>I am a:</Label>
-                  <RadioGroup 
-                    value={userRole} 
-                    onValueChange={(value) => handleRoleSelect(value as UserRole)}
-                  >
-                    <div className="grid grid-cols-1 gap-3 mt-2">
-                      <UserRoleCard 
-                        role="traveler"
-                        title="Traveler"
-                        description="I want to discover and book travel experiences"
-                        isSelected={userRole === 'traveler'}
-                        onSelect={() => handleRoleSelect('traveler')}
-                      />
-                      
-                      <UserRoleCard 
-                        role="guide"
-                        title="Travel Guide"
-                        description="I want to offer my services as a local guide"
-                        isSelected={userRole === 'guide'}
-                        onSelect={() => handleRoleSelect('guide')}
-                      />
-                      
-                      <UserRoleCard 
-                        role="agent"
-                        title="Travel Agent"
-                        description="I want to create and publish tour packages"
-                        isSelected={userRole === 'agent'}
-                        onSelect={() => handleRoleSelect('agent')}
-                      />
-                      
-                      <UserRoleCard 
-                        role="venue"
-                        title="Venue"
-                        description="I represent a club, restaurant or venue"
-                        isSelected={userRole === 'venue'}
-                        onSelect={() => handleRoleSelect('venue')}
-                      />
-                    </div>
-                  </RadioGroup>
+                  <div className="grid grid-cols-1 gap-3 mt-2">
+                    <UserRoleCard 
+                      role="traveler"
+                      title="Traveler"
+                      description="I want to discover and book travel experiences"
+                      isSelected={userRole === 'traveler'}
+                      onSelect={() => handleRoleSelect('traveler')}
+                    />
+                    
+                    <UserRoleCard 
+                      role="guide"
+                      title="Travel Guide"
+                      description="I want to offer my services as a local guide"
+                      isSelected={userRole === 'guide'}
+                      onSelect={() => handleRoleSelect('guide')}
+                    />
+                    
+                    <UserRoleCard 
+                      role="agent"
+                      title="Travel Agent"
+                      description="I want to create and publish tour packages"
+                      isSelected={userRole === 'agent'}
+                      onSelect={() => handleRoleSelect('agent')}
+                    />
+                    
+                    <UserRoleCard 
+                      role="venue"
+                      title="Venue"
+                      description="I represent a club, restaurant or venue"
+                      isSelected={userRole === 'venue'}
+                      onSelect={() => handleRoleSelect('venue')}
+                    />
+                  </div>
                 </div>
                 
                 <Button 
