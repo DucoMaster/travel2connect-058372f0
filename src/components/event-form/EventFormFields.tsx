@@ -25,7 +25,7 @@ export const eventFormSchema = z.object({
   isOpenForPlanning: z.boolean().default(false),
   capacity: z.coerce.number().min(1, { message: 'Capacity must be at least 1' }).optional(),
   imageUrls: z.array(z.string()).optional(),
-  formType: z.enum(['travel', 'clubs', 'events', 'services']),
+  formType: z.enum(['travel', 'clubs', 'events', 'services', 'tours', 'rental']),
 });
 
 export type EventFormValues = z.infer<typeof eventFormSchema>;

@@ -22,7 +22,7 @@ export interface Package {
   id: string;
   title: string;
   description: string;
-  category: 'travel' | 'clubs' | 'events' | 'services' | 'guide';
+  category: 'travel' | 'clubs' | 'events' | 'services' | 'guide' | 'rental' | 'tours';
   location: string;
   price: number; // in credits
   dates: {

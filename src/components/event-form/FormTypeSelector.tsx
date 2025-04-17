@@ -1,8 +1,8 @@
 
 import { Button } from '@/components/ui/button';
-import { Plane, Music, Calendar, Briefcase } from 'lucide-react';
+import { Plane, Music, Calendar, Briefcase, MapPin, Home } from 'lucide-react';
 
-export type FormType = 'travel' | 'clubs' | 'events' | 'services';
+export type FormType = 'travel' | 'clubs' | 'events' | 'services' | 'tours' | 'rental';
 
 interface FormTypeSelectorProps {
   formType: FormType;
@@ -43,6 +43,22 @@ const FormTypeSelector = ({ formType, setFormType }: FormTypeSelectorProps) => {
       >
         <Briefcase className="mr-2 h-4 w-4" />
         Services
+      </Button>
+      <Button 
+        onClick={() => setFormType('tours')} 
+        variant={formType === 'tours' ? 'default' : 'outline'}
+        className={formType === 'tours' ? 'bg-travel-500 hover:bg-travel-600' : ''}
+      >
+        <MapPin className="mr-2 h-4 w-4" />
+        Tours
+      </Button>
+      <Button 
+        onClick={() => setFormType('rental')} 
+        variant={formType === 'rental' ? 'default' : 'outline'}
+        className={formType === 'rental' ? 'bg-travel-500 hover:bg-travel-600' : ''}
+      >
+        <Home className="mr-2 h-4 w-4" />
+        Rentals
       </Button>
     </div>
   );
