@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Calendar, CreditCard, LogIn, LogOut, Menu, Package, User, UserPlus, X } from 'lucide-react';
+import { Calendar, CreditCard, Home, Book, LogIn, LogOut, Menu, Package, User, UserPlus, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useUser } from '@/context/UserContext';
@@ -43,6 +43,7 @@ const Header = () => {
                     <NavigationMenuLink className={cn(
                       "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus:outline-none focus:bg-accent focus:text-accent-foreground disabled:opacity-50 disabled:pointer-events-none bg-background hover:bg-accent hover:text-accent-foreground h-10 py-2 px-4 group w-max"
                     )}>
+                      <Home className="mr-1 h-4 w-4" />
                       Home
                     </NavigationMenuLink>
                   </Link>
@@ -53,6 +54,7 @@ const Header = () => {
                     <NavigationMenuLink className={cn(
                       "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus:outline-none focus:bg-accent focus:text-accent-foreground disabled:opacity-50 disabled:pointer-events-none bg-background hover:bg-accent hover:text-accent-foreground h-10 py-2 px-4 group w-max"
                     )}>
+                      <Book className="mr-1 h-4 w-4" />
                       Guides
                     </NavigationMenuLink>
                   </Link>
@@ -116,9 +118,11 @@ const Header = () => {
               </SheetHeader>
               <div className="mt-8 flex flex-col gap-4">
                 <Link to="/" className="flex items-center gap-2 text-lg" onClick={() => setIsMenuOpen(false)}>
+                  <Home className="h-4 w-4" />
                   Home
                 </Link>
                 <Link to="/guides" className="flex items-center gap-2 text-lg" onClick={() => setIsMenuOpen(false)}>
+                  <Book className="h-4 w-4" />
                   Guides
                 </Link>
                 <Link to="/submit-event" className="flex items-center gap-2 text-lg" onClick={() => setIsMenuOpen(false)}>
