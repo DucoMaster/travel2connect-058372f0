@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Package, UserRole } from '@/types';
@@ -134,6 +135,15 @@ const Home = () => {
     }
   };
   
+  const handleGuideTabClick = () => {
+    if (activeTab !== 'guide') {
+      setActiveTab('guide');
+    } else {
+      // If already on guide tab, navigate to guides page
+      window.location.href = '/guides';
+    }
+  };
+  
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-travel-50 to-travel-100">
       <Header />
@@ -170,7 +180,16 @@ const Home = () => {
                 <TabsTrigger value="clubs">Clubs</TabsTrigger>
                 <TabsTrigger value="events">Events</TabsTrigger>
                 <TabsTrigger value="services">Services</TabsTrigger>
-                <TabsTrigger value="guide">Guide</TabsTrigger>
+                <TabsTrigger 
+                  value="guide" 
+                  onClick={() => {
+                    if (activeTab === 'guide') {
+                      window.location.href = '/guides';
+                    }
+                  }}
+                >
+                  Guide
+                </TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
@@ -187,6 +206,16 @@ const Home = () => {
             <div className="text-center py-12 bg-white rounded-lg shadow-sm">
               <h3 className="text-xl font-medium text-gray-900">No packages found</h3>
               <p className="mt-2 text-gray-500">Try adjusting your search or filters</p>
+              {activeTab === 'guide' && (
+                <div className="mt-4">
+                  <Button 
+                    className="bg-travel-500 hover:bg-travel-600" 
+                    asChild
+                  >
+                    <Link to="/guides">Browse All Guides</Link>
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </section>
