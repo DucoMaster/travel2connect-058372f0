@@ -34,3 +34,14 @@ export interface Package {
   images: string[];
   capacity?: number;
 }
+
+// Event submission form
+export interface EventSubmission {
+  title: string;
+  description: string;
+  location: string;
+  price: number;
+  date: string;
+  capacity?: number;
+  imageUrl?: string;
+}

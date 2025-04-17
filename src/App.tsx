@@ -14,6 +14,7 @@ import Credits from "./pages/Credits";
 import NotFound from "./pages/NotFound";
 import Guides from "./pages/Guides";
 import GuideDetail from "./pages/GuideDetail";
+import SubmitEvent from "./pages/SubmitEvent";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,7 @@ const App = () => (
             <Route path="/register" element={<Register />} />
             <Route path="/guides" element={<Guides />} />
             <Route path="/guides/:id" element={<GuideDetail />} />
+            <Route path="/submit-event" element={<SubmitEvent />} />
             
             {/* Protected routes */}
             <Route 
