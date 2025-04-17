@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Package, UserRole } from '@/types';
@@ -12,7 +11,6 @@ import { Calendar, MapPin, Users } from 'lucide-react';
 import { useUser } from '@/context/UserContext';
 import Header from '@/components/Header';
 
-// Helper function to format dates
 const formatDate = (date: Date) => {
   return new Intl.DateTimeFormat('en-US', {
     month: 'short',
@@ -21,7 +19,6 @@ const formatDate = (date: Date) => {
   }).format(date);
 };
 
-// Helper function to get role-specific CTA
 const getRoleCTA = (userRole: UserRole | undefined, pkg: Package) => {
   switch(userRole) {
     case 'traveler':
@@ -108,7 +105,6 @@ const Home = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState<string>('all');
   
-  // Filter packages based on search term and active tab
   const filteredPackages = mockPackages.filter(pkg => {
     const matchesSearch = pkg.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
                         pkg.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -119,7 +115,6 @@ const Home = () => {
     return matchesSearch && matchesTab;
   });
   
-  // Get welcome message based on user role
   const getWelcomeMessage = () => {
     if (!user) {
       return 'Discover amazing travel experiences';
@@ -169,12 +164,13 @@ const Home = () => {
               onValueChange={setActiveTab} 
               className="w-full sm:w-auto"
             >
-              <TabsList className="grid grid-cols-5 w-full">
+              <TabsList className="grid grid-cols-6 w-full">
                 <TabsTrigger value="all">All</TabsTrigger>
                 <TabsTrigger value="travel">Travel</TabsTrigger>
                 <TabsTrigger value="clubs">Clubs</TabsTrigger>
                 <TabsTrigger value="events">Events</TabsTrigger>
                 <TabsTrigger value="services">Services</TabsTrigger>
+                <TabsTrigger value="guide">Guide</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>

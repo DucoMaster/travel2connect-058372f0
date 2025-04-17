@@ -1,4 +1,3 @@
-
 // User roles
 export type UserRole = 'traveler' | 'guide' | 'agent' | 'venue';
 
@@ -21,7 +20,7 @@ export interface Package {
   id: string;
   title: string;
   description: string;
-  category: 'travel' | 'clubs' | 'events' | 'services';
+  category: 'travel' | 'clubs' | 'events' | 'services' | 'guide';
   location: string;
   price: number; // in credits
   dates: {
@@ -29,7 +28,7 @@ export interface Package {
     end: Date;
   };
   createdBy: string; // user ID
-  creatorRole: 'agent' | 'venue';
+  creatorRole: 'agent' | 'venue' | 'guide';
   images: string[];
   capacity?: number;
 }
