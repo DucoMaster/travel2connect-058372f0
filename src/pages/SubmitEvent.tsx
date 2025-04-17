@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -132,9 +131,9 @@ const SubmitEvent = () => {
                   Note: You must be logged in to submit an event. Your draft will not be saved.
                 </div>
               )}
-            </CardDescription>
 
-            <FormTypeSelector formType={formType} setFormType={setFormType} />
+              <FormTypeSelector formType={formType} setFormType={setFormType} />
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <ReviewNotice />
@@ -169,10 +168,7 @@ const SubmitEvent = () => {
                         Submitting...
                       </>
                     ) : (
-                      <>
-                        Submit {formType === 'travel' ? 'Travel Package' : formType === 'events' ? 'Event' : 'Service'} 
-                        ({EVENT_SUBMISSION_COST} credits)
-                      </>
+                      "Submit Travel Package"
                     )}
                   </Button>
                 </div>
