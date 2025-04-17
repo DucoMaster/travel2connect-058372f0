@@ -1,12 +1,21 @@
+
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Calendar, CreditCard, Home, Book, User, LogIn, LogOut, Menu, Package, UserPlus, X } from 'lucide-react';
+import { Calendar, CreditCard, Home, Book, User, LogIn, LogOut, Menu, Package, UserPlus, X, UserRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useUser } from '@/context/UserContext';
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from '@/components/ui/navigation-menu';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const Header = () => {
   const { user, logout } = useUser();
@@ -17,6 +26,11 @@ const Header = () => {
   const handleLogout = () => {
     logout();
     navigate('/');
+  };
+  
+  const getUserInitials = () => {
+    if (!user || !user.email) return "U";
+    return user.email.charAt(0).toUpperCase();
   };
   
   return (
@@ -82,10 +96,40 @@ const Header = () => {
                   <CreditCard className="h-4 w-4" />
                   {user.credits} Credits
                 </Button>
-                <Button variant="ghost" size="sm" onClick={handleLogout} className="flex items-center gap-1">
-                  <LogOut className="h-4 w-4" />
-                  Log Out
-                </Button>
+                
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="rounded-full">
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback className="bg-travel-500 text-white">
+                          {getUserInitials()}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56 z-50">
+                    <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/profile/create')} className="cursor-pointer">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Manage Profile</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <Calendar className="mr-2 h-4 w-4" />
+                      <span>Manage Events</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <Book className="mr-2 h-4 w-4" />
+                      <span>My Chat</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <Package className="mr-2 h-4 w-4" />
+                      <span>Promotion</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </>
             ) : (
               <>
@@ -139,6 +183,25 @@ const Header = () => {
                       <CreditCard className="h-4 w-4" />
                       {user.credits} Credits
                     </Link>
+                    <div className="flex items-center gap-2 text-lg cursor-pointer" onClick={() => {
+                      navigate('/profile/create');
+                      setIsMenuOpen(false);
+                    }}>
+                      <User className="h-4 w-4" />
+                      Manage Profile
+                    </div>
+                    <div className="flex items-center gap-2 text-lg cursor-pointer" onClick={() => setIsMenuOpen(false)}>
+                      <Calendar className="h-4 w-4" />
+                      Manage Events
+                    </div>
+                    <div className="flex items-center gap-2 text-lg cursor-pointer" onClick={() => setIsMenuOpen(false)}>
+                      <Book className="h-4 w-4" />
+                      My Chat
+                    </div>
+                    <div className="flex items-center gap-2 text-lg cursor-pointer" onClick={() => setIsMenuOpen(false)}>
+                      <Package className="h-4 w-4" />
+                      Promotion
+                    </div>
                     <Button variant="ghost" className="justify-start px-2" onClick={() => {
                       handleLogout();
                       setIsMenuOpen(false);
