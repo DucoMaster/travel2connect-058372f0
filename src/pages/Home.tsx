@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Package, UserRole } from '@/types';
@@ -11,6 +10,8 @@ import { Input } from '@/components/ui/input';
 import { Calendar, MapPin, Users } from 'lucide-react';
 import { useUser } from '@/context/UserContext';
 import Header from '@/components/Header';
+import SearchBar from '@/components/SearchBar';
+import Advertising from '@/components/Advertising';
 
 const formatDate = (date: Date) => {
   return new Intl.DateTimeFormat('en-US', {
@@ -79,11 +80,9 @@ const PackageCard = ({ pkg }: { pkg: Package }) => {
         <p className="text-sm text-muted-foreground line-clamp-2">{pkg.description}</p>
         <div className="mt-3 flex items-center text-xs text-muted-foreground">
           <Calendar className="mr-1 h-3.5 w-3.5" />
-          <span>
-            {pkg.dates.start.getTime() === pkg.dates.end.getTime() 
-              ? formatDate(pkg.dates.start) 
-              : `${formatDate(pkg.dates.start)} - ${formatDate(pkg.dates.end)}`}
-          </span>
+          {pkg.dates.start.getTime() === pkg.dates.end.getTime() 
+            ? formatDate(pkg.dates.start) 
+            : `${formatDate(pkg.dates.start)} - ${formatDate(pkg.dates.end)}`}
         </div>
         {pkg.capacity && (
           <div className="mt-1 flex items-center text-xs text-muted-foreground">
@@ -139,7 +138,6 @@ const Home = () => {
     if (activeTab !== 'guide') {
       setActiveTab('guide');
     } else {
-      // If already on guide tab, navigate to guides page
       window.location.href = '/guides';
     }
   };
@@ -156,6 +154,8 @@ const Home = () => {
               {user ? `Welcome ${user.name || user.email}! You have ${user.credits} credits to use.` : 'Connect with local guides, events, and venues'}
             </p>
           </div>
+          <SearchBar />
+          <Advertising />
         </section>
         
         <section className="mb-6">
