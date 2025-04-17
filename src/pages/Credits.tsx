@@ -2,8 +2,6 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useUser } from '@/context/UserContext';
 import { useToast } from '@/hooks/use-toast';
-import { ClipboardList } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import StripeCheckout from '@/components/StripeCheckout';
 import CreditBalance from '@/components/credits/CreditBalance';
@@ -11,6 +9,7 @@ import RoleUpgrade from '@/components/credits/RoleUpgrade';
 import LoginPrompt from '@/components/credits/LoginPrompt';
 import CreditViewToggle, { CreditView } from '@/components/credits/CreditViewToggle';
 import GoldPriceTracker from '@/components/credits/GoldPriceTracker';
+import { TransactionHistoryDialog } from '@/components/credits/TransactionHistoryDialog';
 
 const Credits = () => {
   const { user } = useUser();
@@ -19,7 +18,6 @@ const Credits = () => {
   const [creditView, setCreditView] = useState<CreditView>('credits');
   const currentGoldPrice = 74.8; // In a real app, this would come from an API
   
-  // Check for success and canceled query parameters
   useEffect(() => {
     const query = new URLSearchParams(location.search);
     if (query.get('success')) {
@@ -36,7 +34,6 @@ const Credits = () => {
     }
   }, [location, toast]);
   
-  // Mock transaction history
   const recentTransactions = user ? [
     { 
       id: '1', 
@@ -65,10 +62,7 @@ const Credits = () => {
                 />
                 <GoldPriceTracker />
                 <StripeCheckout />
-                <Button variant="outline" className="w-full mt-4">
-                  <ClipboardList className="mr-2 h-4 w-4" />
-                  Transaction History
-                </Button>
+                <TransactionHistoryDialog />
               </div>
               
               <div>
