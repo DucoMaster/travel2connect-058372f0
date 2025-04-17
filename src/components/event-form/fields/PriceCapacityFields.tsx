@@ -1,59 +1,49 @@
 
 import { FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Ticket, Users, Coins } from 'lucide-react';
+import { Users } from 'lucide-react';
 import { UseFormReturn } from 'react-hook-form';
 import { EventFormValues } from '../EventFormFields';
 import { FormType } from '../FormTypeSelector';
 import CurrencySelector, { Currency } from './CurrencySelector';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface PriceCapacityFieldsProps {
   form: UseFormReturn<EventFormValues>;
   formType: FormType;
 }
 
-const EXCHANGE_RATES: Record<Currency, number> = {
-  USD: 1,
-  EUR: 0.85,
-  GBP: 0.73,
-  JPY: 110.0
-};
+// Gold price per gram in USD (this would come from an API in a real app)
+const GOLD_PRICE = 74.8;
+// Credits per gram of gold
+const CREDITS_PER_GOLD = 100;
+// Credits to USD conversion rate
+const CREDIT_TO_USD = GOLD_PRICE / CREDITS_PER_GOLD;
 
 const PriceCapacityFields = ({ form, formType }: PriceCapacityFieldsProps) => {
-  const [selectedCurrency, setSelectedCurrency] = useState<Currency>('USD');
-  const [currencyPrice, setCurrencyPrice] = useState<string>('');
+  const [usdPrice, setUsdPrice] = useState<string>('');
 
-  const handleCurrencyPriceChange = (value: string) => {
-    setCurrencyPrice(value);
-    const numericValue = parseFloat(value) || 0;
-    // Convert currency price to credits (1:1 with USD)
-    const creditsValue = (numericValue / EXCHANGE_RATES[selectedCurrency]).toFixed(2);
-    form.setValue('price', parseFloat(creditsValue));
+  const handleCreditChange = (value: string) => {
+    const credits = parseFloat(value) || 0;
+    const usdValue = (credits * CREDIT_TO_USD).toFixed(2);
+    setUsdPrice(usdValue);
+    form.setValue('price', credits);
   };
 
-  const handleCreditsChange = (value: string) => {
-    const numericValue = parseFloat(value) || 0;
-    form.setValue('price', numericValue);
-    // Convert credits to selected currency
-    const currencyValue = (numericValue * EXCHANGE_RATES[selectedCurrency]).toFixed(2);
-    setCurrencyPrice(currencyValue);
+  const handleUsdChange = (value: string) => {
+    const usd = parseFloat(value) || 0;
+    const credits = Math.round(usd / CREDIT_TO_USD);
+    form.setValue('price', credits);
+    setUsdPrice(value);
   };
 
-  const getFormTypeName = () => {
-    switch (formType) {
-      case 'travel':
-        return 'package';
-      case 'events':
-        return 'event';
-      case 'tours':
-        return 'tour';
-      case 'rental':
-        return 'rental';
-      default:
-        return 'service';
+  useEffect(() => {
+    // Initialize USD price based on form price (credits)
+    const initialCredits = form.getValues('price');
+    if (initialCredits) {
+      setUsdPrice((initialCredits * CREDIT_TO_USD).toFixed(2));
     }
-  };
+  }, [form]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -65,23 +55,23 @@ const PriceCapacityFields = ({ form, formType }: PriceCapacityFieldsProps) => {
             <FormLabel>Price in Credits</FormLabel>
             <FormControl>
               <div className="relative">
-                <Coins className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
                 <Input 
                   type="number" 
                   min="0" 
-                  step="0.01"
-                  className="pl-10" 
-                  placeholder="45" 
+                  step="1"
+                  className="pl-8" 
+                  placeholder="100" 
                   value={field.value}
                   onChange={(e) => {
                     field.onChange(e);
-                    handleCreditsChange(e.target.value);
+                    handleCreditChange(e.target.value);
                   }}
                 />
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">₵</span>
               </div>
             </FormControl>
             <FormDescription>
-              Set the price in credits for your {getFormTypeName()}
+              Set the price in credits for your package (100 credits = 1g of gold)
             </FormDescription>
             <FormMessage />
           </FormItem>
@@ -89,35 +79,23 @@ const PriceCapacityFields = ({ form, formType }: PriceCapacityFieldsProps) => {
       />
 
       <FormItem>
-        <FormLabel>Price in Currency</FormLabel>
+        <FormLabel>Price in USD</FormLabel>
         <FormControl>
-          <div className="relative flex gap-2">
-            <div className="relative flex-1">
-              <Ticket className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-              <Input 
-                type="number" 
-                min="0" 
-                step="0.01"
-                className="pl-10" 
-                placeholder="45" 
-                value={currencyPrice}
-                onChange={(e) => handleCurrencyPriceChange(e.target.value)}
-              />
-            </div>
-            <CurrencySelector 
-              value={selectedCurrency}
-              onChange={(currency) => {
-                setSelectedCurrency(currency);
-                // Recalculate currency price when currency changes
-                const creditsValue = form.getValues('price');
-                const newCurrencyValue = (creditsValue * EXCHANGE_RATES[currency]).toFixed(2);
-                setCurrencyPrice(newCurrencyValue);
-              }}
+          <div className="relative">
+            <Input 
+              type="number" 
+              min="0" 
+              step="0.01"
+              className="pl-8" 
+              placeholder="74.80" 
+              value={usdPrice}
+              onChange={(e) => handleUsdChange(e.target.value)}
             />
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
           </div>
         </FormControl>
         <FormDescription>
-          Price in {selectedCurrency}
+          Price in USD (1g of gold = ${GOLD_PRICE})
         </FormDescription>
       </FormItem>
       
