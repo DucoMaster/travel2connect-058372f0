@@ -5,6 +5,17 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Separator } from '@/components/ui/separator';
 import { CreditCard, Coins } from 'lucide-react';
 import { User } from '@/types';
+import { useState } from 'react';
+import CurrencySelector, { Currency } from '@/components/event-form/fields/CurrencySelector';
+
+// Exchange rates relative to USD (these would come from an API in a real app)
+const EXCHANGE_RATES = {
+  USD: 1,
+  EUR: 0.92,
+  GBP: 0.79,
+  JPY: 151.35,
+  PHP: 56.42
+};
 
 interface CreditBalanceProps {
   user: User;
@@ -13,16 +24,28 @@ interface CreditBalanceProps {
 }
 
 export default function CreditBalance({ user, view, goldPrice }: CreditBalanceProps) {
+  const [selectedCurrency, setSelectedCurrency] = useState<Currency>('USD');
+
   // Calculate cash value (1 gram of gold = 100 credits)
-  const cashValue = (user.credits / 100) * goldPrice;
+  const getCashValue = () => {
+    const usdValue = (user.credits / 100) * goldPrice;
+    return (usdValue * EXCHANGE_RATES[selectedCurrency]).toFixed(2);
+  };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Credit Balance</CardTitle>
-        <CardDescription>
-          Your current TravelConnect {view === 'credits' ? 'credits' : 'cash value'}
-        </CardDescription>
+        <div className="flex justify-between items-start">
+          <div>
+            <CardTitle>Credit Balance</CardTitle>
+            <CardDescription>
+              Your current TravelConnect {view === 'credits' ? 'credits' : 'cash value'}
+            </CardDescription>
+          </div>
+          {view === 'cash' && (
+            <CurrencySelector value={selectedCurrency} onChange={setSelectedCurrency} />
+          )}
+        </div>
       </CardHeader>
       <CardContent>
         <div className="flex items-center justify-center p-6">
@@ -42,16 +65,15 @@ export default function CreditBalance({ user, view, goldPrice }: CreditBalancePr
               view === 'credits' ? 'text-travel-800' : 'text-amber-700'
             }`}>
               {view === 'credits' 
-                ? user.credits 
-                : `$${cashValue.toFixed(2)}`
+                ? `${user.credits} credits`
+                : `${selectedCurrency} ${getCashValue()}`
               }
             </div>
-            <div className="text-gray-600 mt-1">
-              {view === 'credits' 
-                ? 'available credits' 
-                : 'cash equivalent'
-              }
-            </div>
+            {view === 'cash' && (
+              <div className="text-sm text-gray-500 mt-1">
+                {user.credits} credits
+              </div>
+            )}
           </div>
         </div>
         
