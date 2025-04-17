@@ -6,7 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { DollarSign, Euro, PoundSterling, Yen } from 'lucide-react';
+import { DollarSign, Euro, PoundSterling, JapaneseYen } from 'lucide-react';
 
 export type Currency = 'USD' | 'EUR' | 'GBP' | 'JPY';
 
@@ -25,7 +25,7 @@ const CurrencySelector = ({ value, onChange }: CurrencySelectorProps) => {
       case 'GBP':
         return <PoundSterling className="h-4 w-4" />;
       case 'JPY':
-        return <Yen className="h-4 w-4" />;
+        return <JapaneseYen className="h-4 w-4" />;
     }
   };
 
@@ -58,7 +58,7 @@ const CurrencySelector = ({ value, onChange }: CurrencySelectorProps) => {
         </SelectItem>
         <SelectItem value="JPY">
           <div className="flex items-center gap-2">
-            <Yen className="h-4 w-4" />
+            <JapaneseYen className="h-4 w-4" />
             <span>JPY</span>
           </div>
         </SelectItem>
