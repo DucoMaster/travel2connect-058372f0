@@ -1,10 +1,10 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Upload } from 'lucide-react';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
@@ -14,7 +14,8 @@ import FormTypeSelector from '@/components/event-form/FormTypeSelector';
 import ImageUploadSection from '@/components/event-form/ImageUploadSection';
 import ReviewNotice from '@/components/event-form/ReviewNotice';
 import FormFooter from '@/components/event-form/FormFooter';
-import EventFormFields, { eventFormSchema, EventFormValues, FormType } from '@/components/event-form/EventFormFields';
+import EventFormFields, { EventFormValues, FormType } from '@/components/event-form/EventFormFields';
+import { eventFormSchema } from '@/components/event-form/EventFormFields';
 
 const SubmitEvent = () => {
   const { user } = useUser();
@@ -24,7 +25,6 @@ const SubmitEvent = () => {
   const [formType, setFormType] = useState<FormType>('travel');
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   
-  // Initialize form with react-hook-form
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventFormSchema),
     defaultValues: {
@@ -39,15 +39,12 @@ const SubmitEvent = () => {
     },
   });
   
-  // Handle form submission
   const onSubmit = (data: EventFormValues) => {
     setIsSubmitting(true);
     
-    // Update the form type based on the selected type
     data.formType = formType;
     data.imageUrls = selectedImages;
     
-    // Simulate API call
     setTimeout(() => {
       console.log('Event submitted:', data);
       
@@ -58,18 +55,14 @@ const SubmitEvent = () => {
       
       setIsSubmitting(false);
       
-      // Reset form
       form.reset();
       setSelectedImages([]);
       
-      // Redirect to home page after successful submission
       navigate('/');
     }, 1500);
   };
 
-  // Handle image upload (simulated)
   const handleImageUpload = () => {
-    // Simulating image upload by adding a placeholder URL
     const placeholderImages = [
       'https://images.unsplash.com/photo-1649972904349-6e44c42644a7',
       'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b',
@@ -80,13 +73,11 @@ const SubmitEvent = () => {
     
     const randomImage = placeholderImages[Math.floor(Math.random() * placeholderImages.length)];
     
-    // Add the image if it's not already in the array
     if (!selectedImages.includes(randomImage)) {
       setSelectedImages([...selectedImages, randomImage]);
     }
   };
 
-  // Delete an image from the selected images
   const handleDeleteImage = (imageUrl: string) => {
     setSelectedImages(selectedImages.filter(url => url !== imageUrl));
   };
@@ -157,23 +148,7 @@ const SubmitEvent = () => {
         </Card>
       </main>
       
-      <footer className="border-t bg-white">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex flex-col sm:flex-row justify-between items-center">
-            <div className="flex items-center gap-2 mb-4 sm:mb-0">
-              <div className="bg-travel-500 text-white p-1 rounded-md">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                </svg>
-              </div>
-              <span className="font-bold text-travel-700">TravelConnect</span>
-            </div>
-            <div className="text-center sm:text-right text-sm text-gray-500">
-              <p>© 2025 TravelConnect. All rights reserved.</p>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

@@ -1,4 +1,3 @@
-
 import { FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -207,4 +206,3 @@ const EventFormFields = ({ form, formType }: EventFormFieldsProps) => {
 };
 
 export default EventFormFields;
-export { eventFormSchema };
