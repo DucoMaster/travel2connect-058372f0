@@ -1,17 +1,20 @@
 
 import { CardFooter } from '@/components/ui/card';
+import { FormType } from './FormTypeSelector';
 
 interface FormFooterProps {
-  formType: 'travel' | 'events' | 'services';
+  formType: FormType;
 }
 
 const FormFooter = ({ formType }: FormFooterProps) => {
   const formTypeName = 
     formType === 'travel' 
       ? 'travel package' 
-      : formType === 'events' 
-        ? 'event' 
-        : 'service';
+      : formType === 'clubs'
+        ? 'club event'
+        : formType === 'events' 
+          ? 'event' 
+          : 'service';
 
   return (
     <CardFooter className="flex flex-col space-y-4 border-t pt-6">
