@@ -17,6 +17,15 @@ const EXCHANGE_RATES = {
   PHP: 56.42
 };
 
+// Currency symbols mapping
+const CURRENCY_SYMBOLS: Record<Currency, string> = {
+  USD: '$',
+  EUR: '€',
+  GBP: '£',
+  JPY: '¥',
+  PHP: '₱'
+};
+
 interface CreditBalanceProps {
   user: User;
   view: 'credits' | 'cash';
@@ -66,7 +75,7 @@ export default function CreditBalance({ user, view, goldPrice }: CreditBalancePr
             }`}>
               {view === 'credits' 
                 ? `${user.credits} credits`
-                : `${selectedCurrency} ${getCashValue()}`
+                : `${CURRENCY_SYMBOLS[selectedCurrency]}${getCashValue()}`
               }
             </div>
             {view === 'cash' && (
@@ -101,3 +110,4 @@ export default function CreditBalance({ user, view, goldPrice }: CreditBalancePr
     </Card>
   );
 }
+
