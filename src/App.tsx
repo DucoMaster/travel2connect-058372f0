@@ -33,50 +33,52 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <UserProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            {/* Public routes */}
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/guides" element={<Guides />} />
-            <Route path="/guides/:id" element={<GuideDetail />} />
-            <Route path="/submit-event" element={<SubmitEvent />} />
-            
-            {/* Protected routes */}
-            <Route 
-              path="/profile/create" 
-              element={
-                <ProtectedRoute>
-                  <CreateProfile />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/credits" 
-              element={
-                <ProtectedRoute>
-                  <Credits />
-                </ProtectedRoute>
-              } 
-            />
-            
-            {/* Package routes */}
-            <Route path="/packages/:id" element={<PackageDetail />} />
-            
-            {/* Catch-all route */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </UserProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <UserProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              {/* Public routes */}
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/guides" element={<Guides />} />
+              <Route path="/guides/:id" element={<GuideDetail />} />
+              <Route path="/submit-event" element={<SubmitEvent />} />
+              
+              {/* Protected routes */}
+              <Route 
+                path="/profile/create" 
+                element={
+                  <ProtectedRoute>
+                    <CreateProfile />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/credits" 
+                element={
+                  <ProtectedRoute>
+                    <Credits />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              {/* Package routes */}
+              <Route path="/packages/:id" element={<PackageDetail />} />
+              
+              {/* Catch-all route */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </UserProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
