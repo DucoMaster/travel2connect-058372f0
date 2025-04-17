@@ -162,7 +162,7 @@ const Guides = () => {
                   <SelectValue placeholder="Any rating" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Any rating</SelectItem>
+                  <SelectItem value="all">Any rating</SelectItem>
                   <SelectItem value="5">★★★★★ (5)</SelectItem>
                   <SelectItem value="4">★★★★☆ (4+)</SelectItem>
                   <SelectItem value="3">★★★☆☆ (3+)</SelectItem>
