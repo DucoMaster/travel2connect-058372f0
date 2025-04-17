@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { mockPackages } from '@/data/mockData';
+import { mockPackages } from '@/data';
 import { Button } from '@/components/ui/button';
 import { Calendar, Clock, CreditCard, MapPin, Star, Users } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
