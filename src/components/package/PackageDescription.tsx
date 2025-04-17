@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Package } from '@/types';
 import { Calendar, Users, CreditCard } from 'lucide-react';

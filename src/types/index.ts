@@ -34,6 +34,9 @@ export interface Package {
   images: string[];
   capacity?: number;
   qrCode?: string; // QR code for event verification
+  visitors: number; // Number of visitors who viewed the package
+  attendees: number; // Number of people who booked
+  creditsEarned: number; // Credits earned from this package
 }
 
 // Event submission form
