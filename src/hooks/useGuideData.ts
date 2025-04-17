@@ -1,7 +1,7 @@
 
 import { useMemo } from 'react';
 import { User, Package } from '@/types';
-import { mockPackages, mockUsers } from '@/data/mockData';
+import { mockPackages, mockUsers } from '@/data';
 
 export const useGuideData = (
   searchTerm: string,

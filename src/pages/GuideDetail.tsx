@@ -1,7 +1,7 @@
 
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { mockUsers, mockPackages } from '@/data/mockData';
+import { mockUsers, mockPackages } from '@/data';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
