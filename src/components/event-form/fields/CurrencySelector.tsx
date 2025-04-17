@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/select";
 import { DollarSign, Euro, PoundSterling, JapaneseYen } from 'lucide-react';
 
-export type Currency = 'USD' | 'EUR' | 'GBP' | 'JPY';
+export type Currency = 'USD' | 'EUR' | 'GBP' | 'JPY' | 'PHP';
 
 interface CurrencySelectorProps {
   value: Currency;
@@ -26,6 +26,8 @@ const CurrencySelector = ({ value, onChange }: CurrencySelectorProps) => {
         return <PoundSterling className="h-4 w-4" />;
       case 'JPY':
         return <JapaneseYen className="h-4 w-4" />;
+      case 'PHP':
+        return <span className="text-sm font-medium">₱</span>;
     }
   };
 
@@ -60,6 +62,12 @@ const CurrencySelector = ({ value, onChange }: CurrencySelectorProps) => {
           <div className="flex items-center gap-2">
             <JapaneseYen className="h-4 w-4" />
             <span>JPY</span>
+          </div>
+        </SelectItem>
+        <SelectItem value="PHP">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">₱</span>
+            <span>PHP</span>
           </div>
         </SelectItem>
       </SelectContent>
