@@ -2,7 +2,8 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ClipboardList } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { ClipboardList, ArrowUpCircle, ArrowDownCircle, Wallet } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 
 interface Transaction {
@@ -33,6 +34,17 @@ const mockTransactions: Transaction[] = [
 export function TransactionHistoryDialog() {
   const { user } = useUser();
 
+  // Calculate totals
+  const totalEarnings = mockTransactions
+    .filter(t => t.type === 'earning')
+    .reduce((sum, t) => sum + t.amount, 0);
+
+  const totalSpending = mockTransactions
+    .filter(t => t.type === 'withdrawal')
+    .reduce((sum, t) => sum + t.amount, 0);
+
+  const availableCredits = totalEarnings - totalSpending;
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -45,6 +57,46 @@ export function TransactionHistoryDialog() {
         <DialogHeader>
           <DialogTitle>Transaction History</DialogTitle>
         </DialogHeader>
+        
+        {/* Summary Cards */}
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-muted-foreground">Total Earnings</p>
+                  <p className="text-2xl font-bold text-green-600">+{totalEarnings}</p>
+                </div>
+                <ArrowUpCircle className="h-4 w-4 text-green-600" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-muted-foreground">Total Spending</p>
+                  <p className="text-2xl font-bold text-red-600">-{totalSpending}</p>
+                </div>
+                <ArrowDownCircle className="h-4 w-4 text-red-600" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-muted-foreground">Available Credits</p>
+                  <p className="text-2xl font-bold">{availableCredits}</p>
+                </div>
+                <Wallet className="h-4 w-4" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         <div className="mt-4">
           <Table>
             <TableHeader>
@@ -77,4 +129,3 @@ export function TransactionHistoryDialog() {
     </Dialog>
   );
 }
-
