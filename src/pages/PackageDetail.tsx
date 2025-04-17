@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { mockPackages } from '@/data';
@@ -13,14 +12,7 @@ import BookingDialog from '@/components/package/BookingDialog';
 import GuideApplyDialog from '@/components/package/GuideApplyDialog';
 import QRCodeDialog from '@/components/package/QRCodeDialog';
 import PackageNotFound from '@/components/package/PackageNotFound';
-
-const formatDate = (date: Date) => {
-  return new Intl.DateTimeFormat('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
-  }).format(date);
-};
+import { formatDate } from '@/utils/PackageUtils';
 
 const PackageDetail = () => {
   const { id } = useParams<{ id: string }>();

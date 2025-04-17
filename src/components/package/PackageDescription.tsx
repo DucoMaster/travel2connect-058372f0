@@ -1,7 +1,7 @@
-
 import React from 'react';
 import { Package } from '@/types';
 import { Calendar, Users, CreditCard } from 'lucide-react';
+import { formatDateRange } from '@/utils/PackageUtils';
 
 interface PackageDescriptionProps {
   pkg: Package;
@@ -20,9 +20,7 @@ const PackageDescription = ({ pkg, formatDate }: PackageDescriptionProps) => {
           <div>
             <h3 className="font-medium text-gray-900">Date</h3>
             <p className="text-gray-600">
-              {pkg?.dates.start.getTime() === pkg?.dates.end.getTime() 
-                ? formatDate(pkg?.dates.start) 
-                : `${formatDate(pkg?.dates.start)} - ${formatDate(pkg?.dates.end)}`}
+              {formatDateRange(pkg?.dates.start, pkg?.dates.end)}
             </p>
           </div>
         </div>

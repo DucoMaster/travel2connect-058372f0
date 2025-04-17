@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Package } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -10,6 +9,7 @@ import {
   DialogHeader, 
   DialogTitle 
 } from '@/components/ui/dialog';
+import { formatDateRange } from '@/utils/PackageUtils';
 
 interface BookingDialogProps {
   pkg: Package;
@@ -48,9 +48,7 @@ const BookingDialog = ({
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">Date</span>
               <span className="font-medium">
-                {pkg?.dates.start.getTime() === pkg?.dates.end.getTime() 
-                  ? formatDate(pkg?.dates.start) 
-                  : `${formatDate(pkg?.dates.start)} - ${formatDate(pkg?.dates.end)}`}
+                {formatDateRange(pkg?.dates.start, pkg?.dates.end)}
               </span>
             </div>
             <div className="flex justify-between text-sm">
