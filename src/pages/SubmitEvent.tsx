@@ -1,8 +1,9 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Upload } from 'lucide-react';
+import { Upload, CreditCard } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -16,6 +17,10 @@ import ReviewNotice from '@/components/event-form/ReviewNotice';
 import FormFooter from '@/components/event-form/FormFooter';
 import EventFormFields, { EventFormValues, FormType } from '@/components/event-form/EventFormFields';
 import { eventFormSchema } from '@/components/event-form/EventFormFields';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+
+// Cost to submit an event
+const EVENT_SUBMISSION_COST = 10;
 
 const SubmitEvent = () => {
   const { user } = useUser();
@@ -32,7 +37,9 @@ const SubmitEvent = () => {
       description: '',
       location: '',
       price: 0,
-      date: '',
+      startDate: '',
+      endDate: '',
+      isOpenForPlanning: false,
       capacity: 1,
       imageUrls: [],
       formType: 'travel',
@@ -45,6 +52,17 @@ const SubmitEvent = () => {
     data.formType = formType;
     data.imageUrls = selectedImages;
     
+    // Check if user has enough credits
+    if (user && user.credits < EVENT_SUBMISSION_COST) {
+      toast({
+        title: "Not enough credits",
+        description: `You need ${EVENT_SUBMISSION_COST} credits to submit an event. You currently have ${user.credits} credits.`,
+        variant: "destructive"
+      });
+      setIsSubmitting(false);
+      return;
+    }
+    
     setTimeout(() => {
       console.log('Event submitted:', data);
       
@@ -52,6 +70,14 @@ const SubmitEvent = () => {
         title: "Event submitted successfully!",
         description: "Your event is pending review and will be published within 24 hours.",
       });
+      
+      // Notify about credits spent
+      if (user) {
+        toast({
+          title: "Credits spent",
+          description: `${EVENT_SUBMISSION_COST} credits have been deducted from your account.`,
+        });
+      }
       
       setIsSubmitting(false);
       
@@ -113,6 +139,14 @@ const SubmitEvent = () => {
           <CardContent>
             <ReviewNotice />
             
+            <Alert className="mb-6">
+              <CreditCard className="h-4 w-4" />
+              <AlertDescription>
+                Submitting an event costs <strong>{EVENT_SUBMISSION_COST} credits</strong>. You currently have{" "}
+                <strong>{user ? user.credits : 0} credits</strong>.
+              </AlertDescription>
+            </Alert>
+            
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <EventFormFields form={form} formType={formType} />
@@ -127,7 +161,7 @@ const SubmitEvent = () => {
                   <Button 
                     type="submit" 
                     className="w-full bg-travel-500 hover:bg-travel-600"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || (user ? user.credits < EVENT_SUBMISSION_COST : false)}
                   >
                     {isSubmitting ? (
                       <>
@@ -136,7 +170,8 @@ const SubmitEvent = () => {
                       </>
                     ) : (
                       <>
-                        Submit {formType === 'travel' ? 'Travel Package' : formType === 'events' ? 'Event' : 'Service'}
+                        Submit {formType === 'travel' ? 'Travel Package' : formType === 'events' ? 'Event' : 'Service'} 
+                        ({EVENT_SUBMISSION_COST} credits)
                       </>
                     )}
                   </Button>
