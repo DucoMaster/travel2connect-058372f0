@@ -33,7 +33,8 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [userRole, setUserRole] = useState<UserRole>('traveler');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { register, toast } = useUser();
+  const { register } = useUser();
+  const { toast } = useToast();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {

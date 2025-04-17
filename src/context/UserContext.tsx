@@ -1,7 +1,6 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User } from '@/types';
-import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from '@/hooks/use-toast';
 
@@ -20,7 +19,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   useEffect(() => {
     // Set up auth state listener
@@ -88,7 +86,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
         title: 'Welcome back!',
         description: 'You have successfully logged in.',
       });
-      navigate('/');
     } catch (error: any) {
       toast({
         title: 'Login failed',
@@ -117,7 +114,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
         title: 'Registration successful',
         description: 'Please check your email to verify your account.',
       });
-      navigate('/profile/create');
     } catch (error: any) {
       toast({
         title: 'Registration failed',
@@ -135,7 +131,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
         title: 'Logged out',
         description: 'You have been successfully logged out.',
       });
-      navigate('/');
     } catch (error: any) {
       toast({
         title: 'Logout failed',
