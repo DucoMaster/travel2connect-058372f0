@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -11,12 +10,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/components/ui/use-toast';
 import { Form } from '@/components/ui/form';
 import { useUser } from '@/context/UserContext';
-import FormTypeSelector from '@/components/event-form/FormTypeSelector';
+import FormTypeSelector, { FormType } from '@/components/event-form/FormTypeSelector';
 import ImageUploadSection from '@/components/event-form/ImageUploadSection';
 import ReviewNotice from '@/components/event-form/ReviewNotice';
 import FormFooter from '@/components/event-form/FormFooter';
-import EventFormFields, { EventFormValues, FormType } from '@/components/event-form/EventFormFields';
-import { eventFormSchema } from '@/components/event-form/EventFormFields';
+import EventFormFields, { EventFormValues, eventFormSchema } from '@/components/event-form/EventFormFields';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 // Cost to submit an event
@@ -115,9 +113,9 @@ const SubmitEvent = () => {
       <main className="flex-1 container mx-auto px-4 py-6">
         <section className="mb-8">
           <div className="max-w-4xl">
-            <h1 className="text-3xl sm:text-4xl font-bold text-travel-800">Submit Your Event</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold text-travel-800">Submit Your {formType.charAt(0).toUpperCase() + formType.slice(1)}</h1>
             <p className="mt-2 text-travel-600">
-              Share your event with our community and start selling tickets
+              Share your {formType} with our community and start selling tickets
             </p>
           </div>
         </section>

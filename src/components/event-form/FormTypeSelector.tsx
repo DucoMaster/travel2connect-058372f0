@@ -1,8 +1,8 @@
 
 import { Button } from '@/components/ui/button';
-import { Plane, Calendar, Briefcase } from 'lucide-react';
+import { Plane, Music, Calendar, Briefcase } from 'lucide-react';
 
-type FormType = 'travel' | 'events' | 'services';
+export type FormType = 'travel' | 'clubs' | 'events' | 'services';
 
 interface FormTypeSelectorProps {
   formType: FormType;
@@ -21,12 +21,20 @@ const FormTypeSelector = ({ formType, setFormType }: FormTypeSelectorProps) => {
         Travel
       </Button>
       <Button 
+        onClick={() => setFormType('clubs')} 
+        variant={formType === 'clubs' ? 'default' : 'outline'}
+        className={formType === 'clubs' ? 'bg-travel-500 hover:bg-travel-600' : ''}
+      >
+        <Music className="mr-2 h-4 w-4" />
+        Clubs
+      </Button>
+      <Button 
         onClick={() => setFormType('events')} 
         variant={formType === 'events' ? 'default' : 'outline'}
         className={formType === 'events' ? 'bg-travel-500 hover:bg-travel-600' : ''}
       >
         <Calendar className="mr-2 h-4 w-4" />
-        Clubs/Events
+        Events
       </Button>
       <Button 
         onClick={() => setFormType('services')} 

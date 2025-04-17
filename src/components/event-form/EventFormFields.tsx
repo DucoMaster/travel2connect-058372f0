@@ -12,6 +12,7 @@ import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
+import { FormType } from './FormTypeSelector';
 
 // Define validation schema for event submission
 export const eventFormSchema = z.object({
@@ -24,11 +25,10 @@ export const eventFormSchema = z.object({
   isOpenForPlanning: z.boolean().default(false),
   capacity: z.coerce.number().min(1, { message: 'Capacity must be at least 1' }).optional(),
   imageUrls: z.array(z.string()).optional(),
-  formType: z.enum(['travel', 'events', 'services']),
+  formType: z.enum(['travel', 'clubs', 'events', 'services']),
 });
 
 export type EventFormValues = z.infer<typeof eventFormSchema>;
-export type FormType = 'travel' | 'events' | 'services';
 
 interface EventFormFieldsProps {
   form: UseFormReturn<EventFormValues>;
@@ -44,6 +44,8 @@ const EventFormFields = ({ form, formType }: EventFormFieldsProps) => {
     switch (formType) {
       case 'travel':
         return "Summer Europe Trip 2025";
+      case 'clubs':
+        return "Nightclub VIP Section Booking";
       case 'events':
         return "Beach Party Festival 2025";
       case 'services':
@@ -57,6 +59,8 @@ const EventFormFields = ({ form, formType }: EventFormFieldsProps) => {
     switch (formType) {
       case 'travel':
         return "Describe your travel package in detail...";
+      case 'clubs':
+        return "Describe the club event, bottle service, VIP perks, etc...";
       case 'events':
         return "Describe your event, performers, activities, etc...";
       case 'services':
@@ -70,6 +74,8 @@ const EventFormFields = ({ form, formType }: EventFormFieldsProps) => {
     switch (formType) {
       case 'travel':
         return "travel destination";
+      case 'clubs':
+        return "club event";
       case 'events':
         return "event";
       case 'services':
