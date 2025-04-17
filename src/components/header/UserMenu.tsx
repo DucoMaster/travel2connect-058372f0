@@ -1,4 +1,3 @@
-
 import { Link, useNavigate } from 'react-router-dom';
 import { CreditCard, LogOut, User, Calendar, Book, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -17,7 +16,6 @@ const UserMenu = () => {
   
   const handleLogout = () => {
     logout();
-    navigate('/');
   };
   
   const getUserInitials = () => {

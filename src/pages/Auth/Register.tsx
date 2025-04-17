@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserRole } from '@/types';
@@ -34,8 +33,7 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [userRole, setUserRole] = useState<UserRole>('traveler');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { register } = useUser();
-  const { toast } = useToast();
+  const { register, toast } = useUser();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -54,18 +52,7 @@ const Register = () => {
 
     try {
       await register(email, password, userRole);
-      toast({
-        title: 'Registration successful',
-        description: 'Welcome to TravelConnect!',
-      });
-      navigate('/profile/create');
     } catch (error) {
-      toast({
-        title: 'Registration failed',
-        description: 'Please try again with a different email.',
-        variant: 'destructive',
-      });
-    } finally {
       setIsSubmitting(false);
     }
   };
