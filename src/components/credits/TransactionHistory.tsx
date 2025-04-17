@@ -1,8 +1,9 @@
+
 import { Plus, ShoppingCart } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import CurrencySelector, { Currency } from '@/components/event-form/fields/CurrencySelector';
 import { useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 // Exchange rates relative to USD (these would come from an API in a real app)
 const EXCHANGE_RATES = {
@@ -83,10 +84,11 @@ export default function TransactionHistory({ transactions }: TransactionHistoryP
                   return null;
                 }}
               />
-              <Bar
-                dataKey="amount"
-                fill={(data) => (data.amount >= 0 ? '#22c55e' : '#ef4444')}
-              />
+              <Bar dataKey="amount">
+                {chartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.amount >= 0 ? '#22c55e' : '#ef4444'} />
+                ))}
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
