@@ -1,16 +1,17 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Package, UserRole } from '@/types';
 import { mockPackages } from '@/data';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Calendar, MapPin, Users } from 'lucide-react';
 import { useUser } from '@/context/UserContext';
 import Header from '@/components/Header';
+import { SearchBar } from '@/components/search/SearchBar';
+import { AdvertisingSpace } from '@/components/advertising/AdvertisingSpace';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const formatDate = (date: Date) => {
   return new Intl.DateTimeFormat('en-US', {
@@ -79,11 +80,9 @@ const PackageCard = ({ pkg }: { pkg: Package }) => {
         <p className="text-sm text-muted-foreground line-clamp-2">{pkg.description}</p>
         <div className="mt-3 flex items-center text-xs text-muted-foreground">
           <Calendar className="mr-1 h-3.5 w-3.5" />
-          <span>
-            {pkg.dates.start.getTime() === pkg.dates.end.getTime() 
-              ? formatDate(pkg.dates.start) 
-              : `${formatDate(pkg.dates.start)} - ${formatDate(pkg.dates.end)}`}
-          </span>
+          {pkg.dates.start.getTime() === pkg.dates.end.getTime() 
+            ? formatDate(pkg.dates.start) 
+            : `${formatDate(pkg.dates.start)} - ${formatDate(pkg.dates.end)}`}
         </div>
         {pkg.capacity && (
           <div className="mt-1 flex items-center text-xs text-muted-foreground">
@@ -104,14 +103,14 @@ const PackageCard = ({ pkg }: { pkg: Package }) => {
 const Home = () => {
   const { user } = useUser();
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState<string>('all');
+  const [activeTab, setActiveTab] = useState<string>('tours');
   
   const filteredPackages = mockPackages.filter(pkg => {
     const matchesSearch = pkg.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
                         pkg.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
                         pkg.description.toLowerCase().includes(searchTerm.toLowerCase());
                         
-    const matchesTab = activeTab === 'all' || pkg.category === activeTab;
+    const matchesTab = activeTab === pkg.category;
     
     return matchesSearch && matchesTab;
   });
@@ -135,15 +134,6 @@ const Home = () => {
     }
   };
   
-  const handleGuideTabClick = () => {
-    if (activeTab !== 'guide') {
-      setActiveTab('guide');
-    } else {
-      // If already on guide tab, navigate to guides page
-      window.location.href = '/guides';
-    }
-  };
-  
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-travel-50 to-travel-100">
       <Header />
@@ -159,40 +149,29 @@ const Home = () => {
         </section>
         
         <section className="mb-6">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div className="w-full sm:w-80">
-              <Input
-                placeholder="Search destinations, packages..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-white"
-              />
-            </div>
-            
-            <Tabs 
-              value={activeTab} 
-              onValueChange={setActiveTab} 
-              className="w-full sm:w-auto"
-            >
-              <TabsList className="grid grid-cols-6 w-full">
-                <TabsTrigger value="all">All</TabsTrigger>
-                <TabsTrigger value="travel">Travel</TabsTrigger>
-                <TabsTrigger value="clubs">Clubs</TabsTrigger>
-                <TabsTrigger value="events">Events</TabsTrigger>
-                <TabsTrigger value="services">Services</TabsTrigger>
-                <TabsTrigger 
-                  value="guide" 
-                  onClick={() => {
-                    if (activeTab === 'guide') {
-                      window.location.href = '/guides';
-                    }
-                  }}
-                >
-                  Guide
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-          </div>
+          <SearchBar />
+        </section>
+        
+        <section className="mb-8">
+          <AdvertisingSpace />
+        </section>
+        
+        <section className="mb-6">
+          <Tabs 
+            value={activeTab} 
+            onValueChange={setActiveTab} 
+            className="w-full"
+          >
+            <TabsList className="grid grid-cols-7 w-full">
+              <TabsTrigger value="tours">Tours</TabsTrigger>
+              <TabsTrigger value="travel">Travel</TabsTrigger>
+              <TabsTrigger value="clubs">Clubs</TabsTrigger>
+              <TabsTrigger value="events">Events</TabsTrigger>
+              <TabsTrigger value="services">Services</TabsTrigger>
+              <TabsTrigger value="rental">Rental</TabsTrigger>
+              <TabsTrigger value="guide">Guide</TabsTrigger>
+            </TabsList>
+          </Tabs>
         </section>
         
         <section>
@@ -206,16 +185,6 @@ const Home = () => {
             <div className="text-center py-12 bg-white rounded-lg shadow-sm">
               <h3 className="text-xl font-medium text-gray-900">No packages found</h3>
               <p className="mt-2 text-gray-500">Try adjusting your search or filters</p>
-              {activeTab === 'guide' && (
-                <div className="mt-4">
-                  <Button 
-                    className="bg-travel-500 hover:bg-travel-600" 
-                    asChild
-                  >
-                    <Link to="/guides">Browse All Guides</Link>
-                  </Button>
-                </div>
-              )}
             </div>
           )}
         </section>
