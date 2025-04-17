@@ -1,4 +1,5 @@
 
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,7 +16,9 @@ import NotFound from "./pages/NotFound";
 import Guides from "./pages/Guides";
 import GuideDetail from "./pages/GuideDetail";
 import SubmitEvent from "./pages/SubmitEvent";
-import { useState } from "react";
+
+// Initialize QueryClient outside of component
+const queryClient = new QueryClient();
 
 // Auth route guard for private routes
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -33,9 +36,6 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const App = () => {
-  // Create a new QueryClient instance within the component
-  const [queryClient] = useState(() => new QueryClient());
-  
   return (
     <QueryClientProvider client={queryClient}>
       <UserProvider>
