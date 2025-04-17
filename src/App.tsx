@@ -15,8 +15,7 @@ import NotFound from "./pages/NotFound";
 import Guides from "./pages/Guides";
 import GuideDetail from "./pages/GuideDetail";
 import SubmitEvent from "./pages/SubmitEvent";
-
-const queryClient = new QueryClient();
+import { useState } from "react";
 
 // Auth route guard for private routes
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -34,6 +33,9 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const App = () => {
+  // Create a new QueryClient instance within the component
+  const [queryClient] = useState(() => new QueryClient());
+  
   return (
     <QueryClientProvider client={queryClient}>
       <UserProvider>
