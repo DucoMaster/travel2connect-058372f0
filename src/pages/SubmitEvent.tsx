@@ -1,8 +1,9 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Upload, CreditCard } from 'lucide-react';
+import { Upload, CreditCard, QrCode } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -146,6 +147,13 @@ const SubmitEvent = () => {
               </AlertDescription>
             </Alert>
             
+            <Alert className="mb-6 bg-travel-50 text-travel-800 border-travel-200">
+              <QrCode className="h-4 w-4" />
+              <AlertDescription>
+                Each event will have a unique QR code that attendees can scan to verify their attendance. This helps track meetups and proves the event took place.
+              </AlertDescription>
+            </Alert>
+            
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <EventFormFields form={form} formType={formType} />
@@ -177,6 +185,10 @@ const SubmitEvent = () => {
                       Submitting an event costs {EVENT_SUBMISSION_COST} credits. You currently have {user.credits} credits.
                     </div>
                   )}
+                  
+                  <div className="text-sm text-gray-500 mt-2 text-center">
+                    Review Process: All submitted events will be reviewed within 24 hours before being published.
+                  </div>
                 </div>
               </form>
             </Form>

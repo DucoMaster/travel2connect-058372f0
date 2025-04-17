@@ -1,16 +1,15 @@
-
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { mockPackages } from '@/data';
 import { Button } from '@/components/ui/button';
-import { Calendar, Clock, CreditCard, MapPin, Star, Users } from 'lucide-react';
+import { Calendar, Clock, CreditCard, MapPin, Star, Users, QrCode } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useUser } from '@/context/UserContext';
 import { useToast } from '@/hooks/use-toast';
 import Header from '@/components/Header';
+import QRCodeDisplay from '@/components/event/QRCodeDisplay';
 
-// Helper function to format dates
 const formatDate = (date: Date) => {
   return new Intl.DateTimeFormat('en-US', {
     month: 'short',
@@ -27,9 +26,9 @@ const PackageDetail = () => {
   
   const [showBookDialog, setShowBookDialog] = useState(false);
   const [showApplyDialog, setShowApplyDialog] = useState(false);
+  const [showQRCodeDialog, setShowQRCodeDialog] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   
-  // Find the package with the matching id
   const pkg = mockPackages.find(p => p.id === id);
   
   if (!pkg) {
@@ -52,10 +51,8 @@ const PackageDetail = () => {
   const handleBook = () => {
     setIsProcessing(true);
     
-    // Simulate booking process
     setTimeout(() => {
       if (user && user.credits >= pkg.price) {
-        // Update user credits
         const updatedUser = {
           ...user,
           credits: user.credits - pkg.price
@@ -83,10 +80,8 @@ const PackageDetail = () => {
   const handleApply = () => {
     setIsProcessing(true);
     
-    // Simulate application process (costs 10 credits)
     setTimeout(() => {
       if (user && user.credits >= 10) {
-        // Update user credits
         const updatedUser = {
           ...user,
           credits: user.credits - 10
@@ -141,8 +136,8 @@ const PackageDetail = () => {
           <div className="bg-white rounded-xl overflow-hidden shadow-sm">
             <div className="aspect-[2/1] w-full overflow-hidden">
               <img 
-                src={pkg.images[0]} 
-                alt={pkg.title} 
+                src={pkg?.images[0]} 
+                alt={pkg?.title} 
                 className="h-full w-full object-cover"
               />
             </div>
@@ -151,20 +146,20 @@ const PackageDetail = () => {
               <div className="flex flex-col lg:flex-row justify-between gap-6">
                 <div className="flex-1">
                   <div className="flex items-start justify-between">
-                    <h1 className="text-3xl font-bold text-travel-800">{pkg.title}</h1>
+                    <h1 className="text-3xl font-bold text-travel-800">{pkg?.title}</h1>
                     <Badge className="ml-2 text-lg bg-travel-500 hover:bg-travel-600 text-white">
-                      {pkg.price} credits
+                      {pkg?.price} credits
                     </Badge>
                   </div>
                   
                   <div className="mt-2 flex items-center text-travel-600">
                     <MapPin className="mr-1 h-4 w-4" />
-                    {pkg.location}
+                    {pkg?.location}
                   </div>
                   
                   <div className="mt-6">
                     <h2 className="text-xl font-semibold text-travel-700">About This Experience</h2>
-                    <p className="mt-2 text-gray-600 leading-relaxed">{pkg.description}</p>
+                    <p className="mt-2 text-gray-600 leading-relaxed">{pkg?.description}</p>
                   </div>
                   
                   <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -173,9 +168,9 @@ const PackageDetail = () => {
                       <div>
                         <h3 className="font-medium text-gray-900">Date</h3>
                         <p className="text-gray-600">
-                          {pkg.dates.start.getTime() === pkg.dates.end.getTime() 
-                            ? formatDate(pkg.dates.start) 
-                            : `${formatDate(pkg.dates.start)} - ${formatDate(pkg.dates.end)}`}
+                          {pkg?.dates.start.getTime() === pkg?.dates.end.getTime() 
+                            ? formatDate(pkg?.dates.start) 
+                            : `${formatDate(pkg?.dates.start)} - ${formatDate(pkg?.dates.end)}`}
                         </p>
                       </div>
                     </div>
@@ -185,7 +180,7 @@ const PackageDetail = () => {
                       <div>
                         <h3 className="font-medium text-gray-900">Group Size</h3>
                         <p className="text-gray-600">
-                          {pkg.capacity ? `Up to ${pkg.capacity} people` : 'Not specified'}
+                          {pkg?.capacity ? `Up to ${pkg.capacity} people` : 'Not specified'}
                         </p>
                       </div>
                     </div>
@@ -194,10 +189,30 @@ const PackageDetail = () => {
                       <CreditCard className="mr-3 h-5 w-5 text-travel-500" />
                       <div>
                         <h3 className="font-medium text-gray-900">Price</h3>
-                        <p className="text-gray-600">{pkg.price} credits per person</p>
+                        <p className="text-gray-600">{pkg?.price} credits per person</p>
                       </div>
                     </div>
                   </div>
+                  
+                  {user && (
+                    <div className="mt-6 border-t pt-6">
+                      <div className="flex items-center mb-3">
+                        <QrCode className="mr-2 h-5 w-5 text-travel-600" />
+                        <h3 className="text-lg font-medium text-travel-700">Event Check-In</h3>
+                      </div>
+                      <p className="text-gray-600 mb-4">
+                        Use the QR code to check in at the event. This helps verify your attendance and confirms the event took place.
+                      </p>
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setShowQRCodeDialog(true)}
+                        className="flex items-center text-travel-600 hover:text-travel-800 hover:bg-travel-50"
+                      >
+                        <QrCode className="mr-2 h-4 w-4" />
+                        View Check-In QR Code
+                      </Button>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="lg:w-80 shrink-0">
@@ -207,7 +222,7 @@ const PackageDetail = () => {
                     <div className="mt-4 space-y-3">
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Price</span>
-                        <span className="font-medium">{pkg.price} credits</span>
+                        <span className="font-medium">{pkg?.price} credits</span>
                       </div>
                       
                       {user && (
@@ -270,32 +285,31 @@ const PackageDetail = () => {
         </div>
       </main>
       
-      {/* Booking Confirmation Dialog */}
       <Dialog open={showBookDialog} onOpenChange={setShowBookDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Confirm Your Booking</DialogTitle>
             <DialogDescription>
-              You're about to book {pkg.title} for {pkg.price} credits.
+              You're about to book {pkg?.title} for {pkg?.price} credits.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
             <div className="space-y-3">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Experience</span>
-                <span className="font-medium">{pkg.title}</span>
+                <span className="font-medium">{pkg?.title}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Date</span>
                 <span className="font-medium">
-                  {pkg.dates.start.getTime() === pkg.dates.end.getTime() 
-                    ? formatDate(pkg.dates.start) 
-                    : `${formatDate(pkg.dates.start)} - ${formatDate(pkg.dates.end)}`}
+                  {pkg?.dates.start.getTime() === pkg?.dates.end.getTime() 
+                    ? formatDate(pkg?.dates.start) 
+                    : `${formatDate(pkg?.dates.start)} - ${formatDate(pkg?.dates.end)}`}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Price</span>
-                <span className="font-medium">{pkg.price} credits</span>
+                <span className="font-medium">{pkg?.price} credits</span>
               </div>
               <div className="flex justify-between text-sm border-t pt-2 mt-2">
                 <span className="text-gray-600">Your current balance</span>
@@ -303,7 +317,7 @@ const PackageDetail = () => {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Balance after booking</span>
-                <span className="font-medium">{(user?.credits || 0) - pkg.price} credits</span>
+                <span className="font-medium">{(user?.credits || 0) - pkg?.price} credits</span>
               </div>
             </div>
           </div>
@@ -311,7 +325,7 @@ const PackageDetail = () => {
             <Button variant="outline" onClick={() => setShowBookDialog(false)}>Cancel</Button>
             <Button 
               className="bg-travel-500 hover:bg-travel-600"
-              disabled={isProcessing || (user?.credits || 0) < pkg.price}
+              disabled={isProcessing || (user?.credits || 0) < (pkg?.price || 0)}
               onClick={handleBook}
             >
               {isProcessing ? 'Processing...' : 'Confirm Booking'}
@@ -320,27 +334,26 @@ const PackageDetail = () => {
         </DialogContent>
       </Dialog>
       
-      {/* Apply to Guide Dialog */}
       <Dialog open={showApplyDialog} onOpenChange={setShowApplyDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Apply to Guide</DialogTitle>
             <DialogDescription>
-              You're applying to guide for {pkg.title}. This will cost 10 credits.
+              You're applying to guide for {pkg?.title}. This will cost 10 credits.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
             <div className="space-y-3">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Experience</span>
-                <span className="font-medium">{pkg.title}</span>
+                <span className="font-medium">{pkg?.title}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Date</span>
                 <span className="font-medium">
-                  {pkg.dates.start.getTime() === pkg.dates.end.getTime() 
-                    ? formatDate(pkg.dates.start) 
-                    : `${formatDate(pkg.dates.start)} - ${formatDate(pkg.dates.end)}`}
+                  {pkg?.dates.start.getTime() === pkg?.dates.end.getTime() 
+                    ? formatDate(pkg?.dates.start) 
+                    : `${formatDate(pkg?.dates.start)} - ${formatDate(pkg?.dates.end)}`}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
@@ -366,6 +379,29 @@ const PackageDetail = () => {
             >
               {isProcessing ? 'Processing...' : 'Submit Application'}
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      <Dialog open={showQRCodeDialog} onOpenChange={setShowQRCodeDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Event Check-In Code</DialogTitle>
+            <DialogDescription>
+              Present this QR code at the event to verify your attendance
+            </DialogDescription>
+          </DialogHeader>
+          
+          {pkg && (
+            <QRCodeDisplay 
+              eventId={pkg.id} 
+              eventTitle={pkg.title}
+              attendeeId={user?.id}
+            />
+          )}
+          
+          <DialogFooter className="mt-4">
+            <Button onClick={() => setShowQRCodeDialog(false)}>Close</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

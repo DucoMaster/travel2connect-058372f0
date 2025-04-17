@@ -33,6 +33,7 @@ export interface Package {
   creatorRole: 'agent' | 'venue' | 'guide';
   images: string[];
   capacity?: number;
+  qrCode?: string; // QR code for event verification
 }
 
 // Event submission form
