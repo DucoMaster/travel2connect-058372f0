@@ -1,13 +1,13 @@
-
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useUser } from '@/context/UserContext';
 import { useToast } from '@/hooks/use-toast';
+import { ClipboardList } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import StripeCheckout from '@/components/StripeCheckout';
 import CreditBalance from '@/components/credits/CreditBalance';
 import RoleUpgrade from '@/components/credits/RoleUpgrade';
-import TransactionHistory from '@/components/credits/TransactionHistory';
 import LoginPrompt from '@/components/credits/LoginPrompt';
 import CreditViewToggle, { CreditView } from '@/components/credits/CreditViewToggle';
 import GoldPriceTracker from '@/components/credits/GoldPriceTracker';
@@ -65,7 +65,10 @@ const Credits = () => {
                 />
                 <GoldPriceTracker />
                 <StripeCheckout />
-                <TransactionHistory transactions={recentTransactions} />
+                <Button variant="outline" className="w-full mt-4">
+                  <ClipboardList className="mr-2 h-4 w-4" />
+                  Transaction History
+                </Button>
               </div>
               
               <div>
