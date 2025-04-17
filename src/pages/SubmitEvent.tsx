@@ -171,6 +171,12 @@ const SubmitEvent = () => {
                       "Submit Travel Package"
                     )}
                   </Button>
+                  
+                  {user && (
+                    <div className="text-sm text-gray-500 mt-2 text-center">
+                      Submitting an event costs {EVENT_SUBMISSION_COST} credits. You currently have {user.credits} credits.
+                    </div>
+                  )}
                 </div>
               </form>
             </Form>
