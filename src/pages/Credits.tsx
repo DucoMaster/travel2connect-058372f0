@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useUser } from '@/context/UserContext';
 import { useToast } from '@/hooks/use-toast';
@@ -9,11 +9,15 @@ import CreditBalance from '@/components/credits/CreditBalance';
 import RoleUpgrade from '@/components/credits/RoleUpgrade';
 import TransactionHistory from '@/components/credits/TransactionHistory';
 import LoginPrompt from '@/components/credits/LoginPrompt';
+import CreditViewToggle, { CreditView } from '@/components/credits/CreditViewToggle';
+import GoldPriceTracker from '@/components/credits/GoldPriceTracker';
 
 const Credits = () => {
   const { user } = useUser();
   const { toast } = useToast();
   const location = useLocation();
+  const [creditView, setCreditView] = useState<CreditView>('credits');
+  const currentGoldPrice = 74.8; // In a real app, this would come from an API
   
   // Check for success and canceled query parameters
   useEffect(() => {
@@ -55,12 +59,21 @@ const Credits = () => {
           {user ? (
             <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="md:col-span-2">
+                <CreditViewToggle 
+                  view={creditView} 
+                  onViewChange={setCreditView} 
+                />
+                <GoldPriceTracker />
                 <StripeCheckout />
                 <TransactionHistory transactions={recentTransactions} />
               </div>
               
               <div>
-                <CreditBalance user={user} />
+                <CreditBalance 
+                  user={user} 
+                  view={creditView}
+                  goldPrice={currentGoldPrice}
+                />
                 <RoleUpgrade userRole={user.role} />
               </div>
             </div>
