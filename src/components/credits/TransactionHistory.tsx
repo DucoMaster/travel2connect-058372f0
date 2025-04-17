@@ -42,8 +42,9 @@ export default function TransactionHistory({ transactions }: TransactionHistoryP
     return amount.toFixed(2);
   };
 
-  // Prepare data for the bar chart
-  const chartData = transactions.map(transaction => ({
+  // Filter out "Initial credits" transactions and prepare data for the bar chart
+  const filteredTransactions = transactions.filter(t => t.description !== "Initial credits");
+  const chartData = filteredTransactions.map(transaction => ({
     date: transaction.date,
     amount: transaction.type === 'purchase' ? transaction.amount : -transaction.amount,
     type: transaction.type
@@ -76,7 +77,7 @@ export default function TransactionHistory({ transactions }: TransactionHistoryP
                           {Math.abs(data.amount)} credits
                         </p>
                         <p className="text-sm text-gray-500">
-                          {selectedCurrency} {convertCreditsToSelectedCurrency(Math.abs(data.amount))}
+                          {convertCreditsToSelectedCurrency(Math.abs(data.amount))} {selectedCurrency}
                         </p>
                       </div>
                     );
@@ -93,9 +94,9 @@ export default function TransactionHistory({ transactions }: TransactionHistoryP
           </ResponsiveContainer>
         </div>
 
-        {transactions.length > 0 ? (
+        {filteredTransactions.length > 0 ? (
           <div className="space-y-4">
-            {transactions.map((transaction) => (
+            {filteredTransactions.map((transaction) => (
               <div key={transaction.id} className="flex items-center justify-between">
                 <div className="flex items-start gap-3">
                   <div className={`p-2 rounded-full ${
@@ -121,7 +122,7 @@ export default function TransactionHistory({ transactions }: TransactionHistoryP
                     {transaction.type === 'purchase' ? '+' : '-'}{transaction.amount} credits
                   </div>
                   <div className="text-sm text-gray-500">
-                    {selectedCurrency} {convertCreditsToSelectedCurrency(transaction.amount)}
+                    {convertCreditsToSelectedCurrency(transaction.amount)} {selectedCurrency}
                   </div>
                 </div>
               </div>
@@ -136,3 +137,4 @@ export default function TransactionHistory({ transactions }: TransactionHistoryP
     </Card>
   );
 }
+
