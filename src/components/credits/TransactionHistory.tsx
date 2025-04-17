@@ -1,8 +1,8 @@
-
 import { Plus, ShoppingCart } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import CurrencySelector, { Currency } from '@/components/event-form/fields/CurrencySelector';
 import { useState } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 // Exchange rates relative to USD (these would come from an API in a real app)
 const EXCHANGE_RATES = {
@@ -41,6 +41,13 @@ export default function TransactionHistory({ transactions }: TransactionHistoryP
     return amount.toFixed(2);
   };
 
+  // Prepare data for the bar chart
+  const chartData = transactions.map(transaction => ({
+    date: transaction.date,
+    amount: transaction.type === 'purchase' ? transaction.amount : -transaction.amount,
+    type: transaction.type
+  }));
+
   return (
     <Card className="mt-6">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
@@ -51,6 +58,39 @@ export default function TransactionHistory({ transactions }: TransactionHistoryP
         <CurrencySelector value={selectedCurrency} onChange={setSelectedCurrency} />
       </CardHeader>
       <CardContent>
+        <div className="h-[300px] w-full mb-6">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis />
+              <Tooltip
+                content={({ active, payload }) => {
+                  if (active && payload && payload.length) {
+                    const data = payload[0].payload;
+                    return (
+                      <div className="bg-white p-2 border rounded shadow-lg">
+                        <p className="text-sm font-medium">{data.date}</p>
+                        <p className="text-sm">
+                          {Math.abs(data.amount)} credits
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {selectedCurrency} {convertCreditsToSelectedCurrency(Math.abs(data.amount))}
+                        </p>
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
+              />
+              <Bar
+                dataKey="amount"
+                fill={(data) => (data.amount >= 0 ? '#22c55e' : '#ef4444')}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
         {transactions.length > 0 ? (
           <div className="space-y-4">
             {transactions.map((transaction) => (
@@ -79,7 +119,7 @@ export default function TransactionHistory({ transactions }: TransactionHistoryP
                     {transaction.type === 'purchase' ? '+' : '-'}{transaction.amount} credits
                   </div>
                   <div className="text-sm text-gray-500">
-                    ≈ {selectedCurrency} {convertCreditsToSelectedCurrency(transaction.amount)}
+                    {selectedCurrency} {convertCreditsToSelectedCurrency(transaction.amount)}
                   </div>
                 </div>
               </div>
