@@ -36,7 +36,7 @@ const CurrencySelector = ({ value, onChange }: CurrencySelectorProps) => {
       <SelectTrigger className="w-[80px]">
         <div className="flex items-center gap-2">
           {getCurrencyIcon(value)}
-          <SelectValue />
+          <span>{value}</span>
         </div>
       </SelectTrigger>
       <SelectContent>
