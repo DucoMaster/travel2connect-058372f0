@@ -13,6 +13,7 @@ import PackageDetail from "./pages/PackageDetail";
 import Credits from "./pages/Credits";
 import NotFound from "./pages/NotFound";
 import Guides from "./pages/Guides";
+import GuideDetail from "./pages/GuideDetail";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/guides" element={<Guides />} />
+            <Route path="/guides/:id" element={<GuideDetail />} />
             
             {/* Protected routes */}
             <Route 
