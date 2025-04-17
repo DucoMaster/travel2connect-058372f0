@@ -1,3 +1,4 @@
+
 // User roles
 export type UserRole = 'traveler' | 'guide' | 'agent' | 'venue';
 
@@ -13,6 +14,7 @@ export interface User {
   credits: number;
   ranking: number;
   createdAt: Date;
+  specialties?: string[];
 }
 
 // Tour/Event package

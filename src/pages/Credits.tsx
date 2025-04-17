@@ -1,6 +1,6 @@
 
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -8,13 +8,32 @@ import { CreditCard, Plus, RefreshCw, ShoppingCart } from 'lucide-react';
 import { useUser } from '@/context/UserContext';
 import { useToast } from '@/hooks/use-toast';
 import Header from '@/components/Header';
+import StripeCheckout from '@/components/StripeCheckout';
 
 const Credits = () => {
   const { user, setUser } = useUser();
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
+  const location = useLocation();
   
-  // Simulate purchasing credits
+  // Check for success and canceled query parameters
+  useEffect(() => {
+    const query = new URLSearchParams(location.search);
+    if (query.get('success')) {
+      toast({
+        title: 'Payment Successful',
+        description: 'Your credits have been added to your account.',
+      });
+    } else if (query.get('canceled')) {
+      toast({
+        title: 'Payment Canceled',
+        description: 'Your payment was canceled. No credits were added.',
+        variant: 'destructive',
+      });
+    }
+  }, [location, toast]);
+  
+  // Simulate purchasing credits (for demonstration purposes)
   const handlePurchaseCredits = (amount: number) => {
     if (!user) return;
     
@@ -39,14 +58,6 @@ const Credits = () => {
     }, 1500);
   };
   
-  // Credit package options
-  const creditPackages = [
-    { amount: 50, price: '$50', popular: false },
-    { amount: 100, price: '$100', popular: true },
-    { amount: 200, price: '$200', popular: false },
-    { amount: 500, price: '$500', popular: false },
-  ];
-  
   // Mock transaction history
   const recentTransactions = user ? [
     { 
@@ -70,41 +81,7 @@ const Credits = () => {
           {user ? (
             <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="md:col-span-2">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Purchase Credits</CardTitle>
-                    <CardDescription>
-                      1 credit = $1 USD. Use credits to book experiences or apply to guide events.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 gap-4">
-                      {creditPackages.map((pkg) => (
-                        <div 
-                          key={pkg.amount}
-                          className={`border rounded-lg p-4 relative transition-all hover:shadow-md ${
-                            pkg.popular ? 'border-travel-500 bg-travel-50' : 'hover:border-travel-200'
-                          }`}
-                        >
-                          {pkg.popular && (
-                            <div className="absolute -top-3 right-4 bg-travel-500 text-white text-xs py-1 px-3 rounded-full">
-                              Most Popular
-                            </div>
-                          )}
-                          <div className="text-2xl font-bold text-travel-700">{pkg.amount} Credits</div>
-                          <div className="text-gray-600 mt-1">{pkg.price} USD</div>
-                          <Button 
-                            className="w-full mt-4 bg-travel-500 hover:bg-travel-600"
-                            disabled={isProcessing}
-                            onClick={() => handlePurchaseCredits(pkg.amount)}
-                          >
-                            {isProcessing ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'Purchase'}
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
+                <StripeCheckout />
                 
                 <Card className="mt-6">
                   <CardHeader>

@@ -1,0 +1,155 @@
+
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Check, CreditCard, RefreshCw } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { useUser } from '@/context/UserContext';
+
+interface PriceTier {
+  id: string;
+  credits: number;
+  price: number;
+  popular?: boolean;
+}
+
+const priceTiers: PriceTier[] = [
+  { id: 'tier1', credits: 50, price: 50 },
+  { id: 'tier2', credits: 100, price: 100, popular: true },
+  { id: 'tier3', credits: 200, price: 200 },
+  { id: 'tier4', credits: 500, price: 500 },
+];
+
+export default function StripeCheckout() {
+  const { user } = useUser();
+  const [selectedTier, setSelectedTier] = useState<PriceTier | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const handleCheckout = async () => {
+    if (!selectedTier) {
+      toast({
+        title: "No tier selected",
+        description: "Please select a credit package to purchase.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      // This is a mock implementation. In a real app, this would call your Supabase Edge Function
+      // const { data, error } = await supabase.functions.invoke("create-payment", {
+      //   body: {
+      //     amount: selectedTier.price,
+      //     credits: selectedTier.credits
+      //   }
+      // });
+      
+      // if (error) throw error;
+      // window.location.href = data.url;
+      
+      // For this demo, we'll just simulate a payment process
+      setTimeout(() => {
+        toast({
+          title: "Payment process simulated",
+          description: "In a real app, this would redirect to Stripe. Please set up Stripe Edge Functions in Supabase.",
+        });
+        setIsLoading(false);
+        
+        // Redirect to Credits page after simulation
+        navigate('/credits');
+      }, 1500);
+    } catch (error) {
+      console.error('Payment error:', error);
+      toast({
+        title: "Payment error",
+        description: "There was an error initiating the payment process.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+    }
+  };
+
+  if (!user) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Login Required</CardTitle>
+          <CardDescription>
+            Please login to purchase credits
+          </CardDescription>
+        </CardHeader>
+        <CardFooter>
+          <Button 
+            onClick={() => navigate('/login')}
+            className="w-full"
+          >
+            Login to Continue
+          </Button>
+        </CardFooter>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Purchase Credits</CardTitle>
+        <CardDescription>
+          Select a credit package to purchase
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-2 gap-4">
+          {priceTiers.map((tier) => (
+            <div 
+              key={tier.id}
+              className={`border rounded-lg p-4 relative transition-all cursor-pointer ${
+                selectedTier?.id === tier.id 
+                  ? 'border-travel-500 bg-travel-50 ring-2 ring-travel-300' 
+                  : 'hover:border-travel-200 hover:bg-gray-50'
+              }`}
+              onClick={() => setSelectedTier(tier)}
+            >
+              {tier.popular && (
+                <div className="absolute -top-3 right-4 bg-travel-500 text-white text-xs py-1 px-3 rounded-full">
+                  Most Popular
+                </div>
+              )}
+              {selectedTier?.id === tier.id && (
+                <div className="absolute top-2 right-2 text-travel-500">
+                  <Check className="h-5 w-5" />
+                </div>
+              )}
+              <div className="text-2xl font-bold text-travel-700">{tier.credits} Credits</div>
+              <div className="text-gray-600 mt-1">${tier.price} USD</div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+      <CardFooter>
+        <Button 
+          onClick={handleCheckout}
+          disabled={isLoading || !selectedTier}
+          className="w-full bg-travel-500 hover:bg-travel-600"
+        >
+          {isLoading ? (
+            <>
+              <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+              Processing...
+            </>
+          ) : (
+            <>
+              <CreditCard className="mr-2 h-4 w-4" />
+              Checkout with Stripe
+            </>
+          )}
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+}
