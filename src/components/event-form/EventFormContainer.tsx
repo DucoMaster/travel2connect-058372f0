@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -16,6 +15,7 @@ import FormFooter from '@/components/event-form/FormFooter';
 import EventFormFields, { EventFormValues, eventFormSchema } from '@/components/event-form/EventFormFields';
 import CreditRequirementAlert from '@/components/event-form/CreditRequirementAlert';
 import VerificationAlert from '@/components/event-form/VerificationAlert';
+import SubmissionSuccessDialog from '@/components/event-form/SubmissionSuccessDialog';
 
 // Cost to submit an event
 export const EVENT_SUBMISSION_COST = 10;
@@ -31,6 +31,7 @@ const EventFormContainer = ({ formType, setFormType }: EventFormContainerProps) 
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventFormSchema),
@@ -72,10 +73,9 @@ const EventFormContainer = ({ formType, setFormType }: EventFormContainerProps) 
       
       console.log('Event submitted:', data);
       
-      toast({
-        title: "Event submitted successfully!",
-        description: "Your event is pending review and will be published within 24 hours.",
-      });
+      // Show success dialog instead of toast
+      setShowSuccessDialog(true);
+      setIsSubmitting(false);
       
       // Notify about credits spent
       if (user) {
@@ -84,12 +84,6 @@ const EventFormContainer = ({ formType, setFormType }: EventFormContainerProps) 
           description: `${EVENT_SUBMISSION_COST} credits have been deducted from your account.`,
         });
       }
-      
-      setIsSubmitting(false);
-      form.reset();
-      setSelectedImages([]);
-      
-      navigate('/');
     } catch (error) {
       console.error('Error submitting event:', error);
       toast({
@@ -101,6 +95,17 @@ const EventFormContainer = ({ formType, setFormType }: EventFormContainerProps) 
     }
   };
 
+  const handleSuccessDialogClose = () => {
+    setShowSuccessDialog(false);
+    navigate('/');
+  };
+
+  const handleSubmitAnother = () => {
+    setShowSuccessDialog(false);
+    form.reset();
+    setSelectedImages([]);
+  };
+
   const handleImageUpload = (imageUrl: string) => {
     setSelectedImages([...selectedImages, imageUrl]);
   };
@@ -110,68 +115,76 @@ const EventFormContainer = ({ formType, setFormType }: EventFormContainerProps) 
   };
   
   return (
-    <Card className="max-w-3xl mx-auto bg-white">
-      <CardHeader>
-        <CardTitle>Event Details</CardTitle>
-        <CardDescription>
-          Select the type of event you want to submit and fill out the form.
-          {!user && (
-            <div className="mt-2 text-red-500">
-              Note: You must be logged in to submit an event. Your draft will not be saved.
-            </div>
-          )}
-
-          <FormTypeSelector formType={formType} setFormType={setFormType} />
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ReviewNotice />
-        
-        <CreditRequirementAlert cost={EVENT_SUBMISSION_COST} userCredits={user ? user.credits : 0} />
-        
-        <VerificationAlert />
-        
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <EventFormFields form={form} formType={formType} />
-            
-            <ImageUploadSection 
-              selectedImages={selectedImages}
-              onImageUpload={handleImageUpload}
-              onImageDelete={handleDeleteImage}
-            />
-            
-            <div className="pt-4">
-              <Button 
-                type="submit" 
-                className="w-full bg-travel-500 hover:bg-travel-600"
-                disabled={isSubmitting || (user ? user.credits < EVENT_SUBMISSION_COST : false)}
-              >
-                {isSubmitting ? (
-                  <>
-                    <Upload className="mr-2 h-4 w-4 animate-spin" />
-                    Submitting...
-                  </>
-                ) : (
-                  `Submit ${formType.charAt(0).toUpperCase() + formType.slice(1)} Package`
-                )}
-              </Button>
-              
-              {user && (
-                <div className="text-sm text-gray-500 mt-2 text-center">
-                  Submitting an event costs {EVENT_SUBMISSION_COST} credits. You currently have {user.credits} credits.
-                </div>
-              )}
-              
-              <div className="text-sm text-gray-500 mt-2 text-center">
-                Review Process: All submitted events will be reviewed within 24 hours before being published.
+    <>
+      <Card className="max-w-3xl mx-auto bg-white">
+        <CardHeader>
+          <CardTitle>Event Details</CardTitle>
+          <CardDescription>
+            Select the type of event you want to submit and fill out the form.
+            {!user && (
+              <div className="mt-2 text-red-500">
+                Note: You must be logged in to submit an event. Your draft will not be saved.
               </div>
-            </div>
-          </form>
-        </Form>
-      </CardContent>
-      <FormFooter formType={formType} />
-    </Card>
+            )}
+
+            <FormTypeSelector formType={formType} setFormType={setFormType} />
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ReviewNotice />
+          
+          <CreditRequirementAlert cost={EVENT_SUBMISSION_COST} userCredits={user ? user.credits : 0} />
+          
+          <VerificationAlert />
+          
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <EventFormFields form={form} formType={formType} />
+              
+              <ImageUploadSection 
+                selectedImages={selectedImages}
+                onImageUpload={handleImageUpload}
+                onImageDelete={handleDeleteImage}
+              />
+              
+              <div className="pt-4">
+                <Button 
+                  type="submit" 
+                  className="w-full bg-travel-500 hover:bg-travel-600"
+                  disabled={isSubmitting || (user ? user.credits < EVENT_SUBMISSION_COST : false)}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Upload className="mr-2 h-4 w-4 animate-spin" />
+                      Submitting...
+                    </>
+                  ) : (
+                    `Submit ${formType.charAt(0).toUpperCase() + formType.slice(1)} Package`
+                  )}
+                </Button>
+                
+                {user && (
+                  <div className="text-sm text-gray-500 mt-2 text-center">
+                    Submitting an event costs {EVENT_SUBMISSION_COST} credits. You currently have {user.credits} credits.
+                  </div>
+                )}
+                
+                <div className="text-sm text-gray-500 mt-2 text-center">
+                  Review Process: All submitted events will be reviewed within 24 hours before being published.
+                </div>
+              </div>
+            </form>
+          </Form>
+        </CardContent>
+        <FormFooter formType={formType} />
+      </Card>
+      
+      <SubmissionSuccessDialog 
+        isOpen={showSuccessDialog}
+        onClose={handleSuccessDialogClose}
+        onSubmitAnother={handleSubmitAnother}
+      />
+    </>
   );
 };
 
