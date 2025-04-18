@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { FormDescription, FormLabel } from '@/components/ui/form';
 import { Upload, X } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useUser } from '@/context/UserContext';
 import { uploadFile, deleteFile } from '@/utils/fileUploadUtils';
 import { useState } from 'react';

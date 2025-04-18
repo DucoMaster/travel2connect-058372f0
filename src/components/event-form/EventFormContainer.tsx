@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Upload } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { Form } from '@/components/ui/form';
 import { useUser } from '@/context/UserContext';
 import { Button } from '@/components/ui/button';
@@ -48,9 +48,10 @@ const EventFormContainer = ({ formType, setFormType }: EventFormContainerProps) 
     },
   });
   
-  const onSubmit = (data: EventFormValues) => {
+  const onSubmit = async (data: EventFormValues) => {
     setIsSubmitting(true);
     
+    // Set the current form type and images 
     data.formType = formType;
     data.imageUrls = selectedImages;
     
@@ -65,7 +66,10 @@ const EventFormContainer = ({ formType, setFormType }: EventFormContainerProps) 
       return;
     }
     
-    setTimeout(() => {
+    try {
+      // Simulate API call with setTimeout
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
       console.log('Event submitted:', data);
       
       toast({
@@ -82,12 +86,19 @@ const EventFormContainer = ({ formType, setFormType }: EventFormContainerProps) 
       }
       
       setIsSubmitting(false);
-      
       form.reset();
       setSelectedImages([]);
       
       navigate('/');
-    }, 1500);
+    } catch (error) {
+      console.error('Error submitting event:', error);
+      toast({
+        title: "Submission failed",
+        description: "There was an error submitting your event. Please try again.",
+        variant: "destructive"
+      });
+      setIsSubmitting(false);
+    }
   };
 
   const handleImageUpload = (imageUrl: string) => {
