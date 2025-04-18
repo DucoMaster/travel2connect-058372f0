@@ -11,6 +11,7 @@ import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 import CreateProfile from "./pages/Profile/CreateProfile";
 import PackageDetail from "./pages/PackageDetail";
+import BookPackage from "./pages/BookPackage";
 import Credits from "./pages/Credits";
 import NotFound from "./pages/NotFound";
 import Guides from "./pages/Guides";
