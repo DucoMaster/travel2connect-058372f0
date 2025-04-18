@@ -9,6 +9,65 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      event_packages: {
+        Row: {
+          capacity: number | null
+          category: string
+          created_at: string
+          creator_id: string | null
+          description: string
+          end_date: string | null
+          id: string
+          image_urls: string[] | null
+          is_open_for_planning: boolean | null
+          location: string
+          price: number
+          start_date: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          capacity?: number | null
+          category: string
+          created_at?: string
+          creator_id?: string | null
+          description: string
+          end_date?: string | null
+          id?: string
+          image_urls?: string[] | null
+          is_open_for_planning?: boolean | null
+          location: string
+          price: number
+          start_date: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          capacity?: number | null
+          category?: string
+          created_at?: string
+          creator_id?: string | null
+          description?: string
+          end_date?: string | null
+          id?: string
+          image_urls?: string[] | null
+          is_open_for_planning?: boolean | null
+          location?: string
+          price?: number
+          start_date?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_packages_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string

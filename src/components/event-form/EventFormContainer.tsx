@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -9,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Form } from '@/components/ui/form';
 import { useUser } from '@/context/UserContext';
 import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
 import FormTypeSelector, { FormType } from '@/components/event-form/FormTypeSelector';
 import ImageUploadSection from '@/components/event-form/ImageUploadSection';
 import ReviewNotice from '@/components/event-form/ReviewNotice';
@@ -58,10 +58,10 @@ const EventFormContainer = ({ formType, setFormType }: EventFormContainerProps) 
     data.imageUrls = selectedImages;
     
     // Check if user has enough credits
-    if (user && user.credits < EVENT_SUBMISSION_COST) {
+    if (!user || user.credits < EVENT_SUBMISSION_COST) {
       toast({
         title: "Not enough credits",
-        description: `You need ${EVENT_SUBMISSION_COST} credits to submit an event. You currently have ${user.credits} credits.`,
+        description: `You need ${EVENT_SUBMISSION_COST} credits to submit an event. You currently have ${user?.credits || 0} credits.`,
         variant: "destructive"
       });
       setIsSubmitting(false);
@@ -69,22 +69,52 @@ const EventFormContainer = ({ formType, setFormType }: EventFormContainerProps) 
     }
     
     try {
-      // Simulate API call with setTimeout
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Insert the event package into Supabase
+      const { error } = await supabase
+        .from('event_packages')
+        .insert({
+          title: data.title,
+          description: data.description,
+          location: data.location,
+          price: data.price,
+          start_date: data.startDate,
+          end_date: data.endDate,
+          capacity: data.capacity,
+          is_open_for_planning: data.isOpenForPlanning,
+          category: formType,
+          image_urls: selectedImages,
+          creator_id: user.id
+        });
+
+      if (error) throw error;
+
+      // Update user credits in Supabase
+      const { error: creditError } = await supabase
+        .from('profiles')
+        .update({ credits: user.credits - EVENT_SUBMISSION_COST })
+        .eq('id', user.id);
+
+      if (creditError) throw creditError;
+
+      // Update local user state
+      if (user) {
+        const updatedUser = {
+          ...user,
+          credits: user.credits - EVENT_SUBMISSION_COST
+        };
+        setUser(updatedUser);
+      }
       
-      console.log('Event submitted:', data);
-      
-      // Show success dialog instead of toast
+      // Show success dialog
       setShowSuccessDialog(true);
       setIsSubmitting(false);
       
       // Notify about credits spent
-      if (user) {
-        toast({
-          title: "Credits spent",
-          description: `${EVENT_SUBMISSION_COST} credits have been deducted from your account.`,
-        });
-      }
+      toast({
+        title: "Credits spent",
+        description: `${EVENT_SUBMISSION_COST} credits have been deducted from your account.`,
+      });
+
     } catch (error) {
       console.error('Error submitting event:', error);
       toast({
