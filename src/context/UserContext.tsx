@@ -38,7 +38,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       const newUser: User = {
         id: '1',
         email,
-        role: 'traveler',
+        role: 'traveler' as UserRole, // Explicitly cast as UserRole
         credits: 100,
         ranking: 5,
         createdAt: new Date()
@@ -66,7 +66,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       const newUser: User = {
         id: '1',
         email,
-        role,
+        role, // This is already of type UserRole
         credits: 100, // All new users get 100 credits
         ranking: 5,   // All new users start with 5-star ranking
         createdAt: new Date()
