@@ -1,13 +1,14 @@
-
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Package } from '@/types';
-import { mockPackages } from '@/data';
+import { mockPackages, mockUsers } from '@/data';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MapPin, Calendar, Users, ArrowLeft, Star, Share2 } from 'lucide-react';
+import { MapPin, Calendar, Users, ArrowLeft, Star, Share2, User, Mail } from 'lucide-react';
 import { formatDateRange } from '@/utils/PackageUtils';
 import { Card } from '@/components/ui/card';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from '@/components/ui/carousel';
 import Header from '@/components/Header';
 import { useToast } from '@/hooks/use-toast';
@@ -17,6 +18,9 @@ const BookPackage = () => {
   const pkg = mockPackages.find(p => p.id === id);
   const { toast } = useToast();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [showContactDialog, setShowContactDialog] = useState(false);
+
+  const host = mockUsers.find(user => user.id === pkg?.createdBy);
 
   if (!pkg) {
     return (
@@ -56,8 +60,15 @@ const BookPackage = () => {
     }
   };
 
-  const rating = 4.97; // This would come from your backend in a real app
-  const reviews = 143; // This would come from your backend in a real app
+  const handleContact = async () => {
+    toast({
+      description: "Message sent to host! They will contact you soon.",
+    });
+    setShowContactDialog(false);
+  };
+
+  const rating = 4.97;
+  const reviews = 143;
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-travel-50 to-travel-100">
@@ -73,7 +84,6 @@ const BookPackage = () => {
         </Link>
 
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Main content */}
           <div className="flex-1">
             <ScrollArea className="h-[calc(100vh-200px)]">
               <div className="pr-4">
@@ -138,6 +148,52 @@ const BookPackage = () => {
                   </div>
                 </div>
 
+                <Card className="p-4 mb-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-12 w-12">
+                        <AvatarImage src={host?.profileImage} alt={host?.name} />
+                        <AvatarFallback>
+                          <User className="h-6 w-6" />
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <h3 className="font-medium">Hosted by</h3>
+                        <Link 
+                          to={`/guides/${host?.id}`} 
+                          className="text-travel-600 hover:text-travel-800"
+                        >
+                          {host?.name}
+                        </Link>
+                      </div>
+                    </div>
+                    <Dialog open={showContactDialog} onOpenChange={setShowContactDialog}>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" className="gap-2">
+                          <Mail className="h-4 w-4" />
+                          Contact Host
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Contact {host?.name}</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4 pt-4">
+                          <p className="text-gray-600">
+                            Send a message to {host?.name} for more information about this experience.
+                          </p>
+                          <Button 
+                            className="w-full bg-travel-500 hover:bg-travel-600"
+                            onClick={handleContact}
+                          >
+                            Send Message
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                </Card>
+
                 <div className="space-y-6 mb-8">
                   <Card className="p-4">
                     <h2 className="font-semibold text-lg mb-3">Trip Details</h2>
@@ -187,7 +243,6 @@ const BookPackage = () => {
             </ScrollArea>
           </div>
 
-          {/* Sidebar */}
           <div className="lg:w-80 shrink-0">
             <div className="sticky top-6">
               <Card className="p-4">
