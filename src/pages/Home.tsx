@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Package, UserRole } from '@/types';
 import { mockPackages } from '@/data';
@@ -192,7 +192,7 @@ const Home = () => {
         {!user && (
           <section className="mt-12 bg-gradient-to-r from-travel-600 to-coral-500 rounded-xl p-8 text-white">
             <div className="max-w-3xl mx-auto text-center">
-              <h2 className="text-2xl sm:text-3xl font-bold">Join TravelConnect Today</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold">Join Travel2Connect Today</h2>
               <p className="mt-3 text-white/90">
                 Create an account to browse and book exclusive travel experiences, or register as a guide, agent, or venue to offer your services.
               </p>
