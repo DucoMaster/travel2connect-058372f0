@@ -1,8 +1,10 @@
+
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Package } from '@/types';
 import { mockPackages, mockUsers } from '@/data';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { MapPin, ArrowLeft, Share2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import ImageCarousel from '@/components/package/booking/ImageCarousel';
