@@ -1,25 +1,22 @@
-
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Package } from '@/types';
 import { mockPackages, mockUsers } from '@/data';
 import { Button } from '@/components/ui/button';
-import { MapPin, ArrowLeft, Share2, Mail, User } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import Header from '@/components/Header';
+import { MapPin, ArrowLeft, Share2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import ImageCarousel from '@/components/package/booking/ImageCarousel';
 import RatingDisplay from '@/components/package/booking/RatingDisplay';
 import BookingInformation from '@/components/package/booking/BookingInformation';
+import HostInformation from '@/components/package/booking/HostInformation';
+import AboutSection from '@/components/package/booking/AboutSection';
+import Header from '@/components/Header';
 
 const BookPackage = () => {
   const { id } = useParams();
   const pkg = mockPackages.find(p => p.id === id);
   const { toast } = useToast();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [showContactDialog, setShowContactDialog] = useState(false);
   const [selectedDateRange, setSelectedDateRange] = useState<string>(
     pkg?.dates ? `${pkg.dates.start}-${pkg.dates.end}` : ''
   );
@@ -73,13 +70,6 @@ const BookPackage = () => {
     }
   };
 
-  const handleContact = async () => {
-    toast({
-      description: "Message sent to host! They will contact you soon.",
-    });
-    setShowContactDialog(false);
-  };
-
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-travel-50 to-travel-100">
       <Header />
@@ -121,52 +111,8 @@ const BookPackage = () => {
               <RatingDisplay rating={rating} reviews={reviews} />
             </div>
 
-            <Card className="p-4 mb-6">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-12 w-12">
-                    <AvatarImage src={host?.profileImage} alt={host?.name} />
-                    <AvatarFallback>
-                      <User className="h-6 w-6" />
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h3 className="font-medium">Hosted by</h3>
-                    <Link 
-                      to={`/guides/${host?.id}`} 
-                      className="text-travel-600 hover:text-travel-800"
-                    >
-                      {host?.name}
-                    </Link>
-                  </div>
-                </div>
-                <Dialog open={showContactDialog} onOpenChange={setShowContactDialog}>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" className="gap-2">
-                      <Mail className="h-4 w-4" />
-                      Contact Host
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Contact {host?.name}</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4 pt-4">
-                      <p className="text-gray-600">
-                        Send a message to {host?.name} for more information about this experience.
-                      </p>
-                      <Button 
-                        className="w-full bg-travel-500 hover:bg-travel-600"
-                        onClick={handleContact}
-                      >
-                        Send Message
-                      </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
-            </Card>
-
+            <HostInformation host={host} />
+            
             <BookingInformation
               pkg={pkg}
               selectedDateRange={selectedDateRange}
@@ -174,10 +120,7 @@ const BookPackage = () => {
               availableDates={availableDates}
             />
 
-            <Card className="p-4">
-              <h2 className="font-semibold text-lg mb-3">About This Experience</h2>
-              <p className="text-gray-600 whitespace-pre-line">{pkg.description}</p>
-            </Card>
+            <AboutSection description={pkg.description} />
           </div>
 
           <div className="lg:w-80 shrink-0">
