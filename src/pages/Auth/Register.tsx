@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserRole } from '@/types';
@@ -53,7 +54,18 @@ const Register = () => {
 
     try {
       await register(email, password, userRole);
+      toast({
+        title: 'Registration successful',
+        description: 'Welcome to TravelConnect!',
+      });
+      navigate('/profile/create');
     } catch (error) {
+      toast({
+        title: 'Registration failed',
+        description: 'Please try again with a different email.',
+        variant: 'destructive',
+      });
+    } finally {
       setIsSubmitting(false);
     }
   };

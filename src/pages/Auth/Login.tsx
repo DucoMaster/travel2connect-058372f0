@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -21,8 +22,18 @@ const Login = () => {
 
     try {
       await login(email, password);
+      toast({
+        title: 'Login successful',
+        description: 'Welcome back to TravelConnect!',
+      });
       navigate('/');
     } catch (error) {
+      toast({
+        title: 'Login failed',
+        description: 'Please check your credentials and try again.',
+        variant: 'destructive',
+      });
+    } finally {
       setIsSubmitting(false);
     }
   };
