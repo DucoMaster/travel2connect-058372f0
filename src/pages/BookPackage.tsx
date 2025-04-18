@@ -1,19 +1,18 @@
+
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Package } from '@/types';
 import { mockPackages, mockUsers } from '@/data';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { MapPin, Calendar, Users, ArrowLeft, Star, Share2, User, Mail } from 'lucide-react';
-import { formatDateRange } from '@/utils/PackageUtils';
+import { MapPin, ArrowLeft, Share2, Mail, User } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from '@/components/ui/carousel';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { format } from 'date-fns';
 import Header from '@/components/Header';
 import { useToast } from '@/hooks/use-toast';
+import ImageCarousel from '@/components/package/booking/ImageCarousel';
+import RatingDisplay from '@/components/package/booking/RatingDisplay';
+import BookingInformation from '@/components/package/booking/BookingInformation';
 
 const BookPackage = () => {
   const { id } = useParams();
@@ -21,15 +20,14 @@ const BookPackage = () => {
   const { toast } = useToast();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [showContactDialog, setShowContactDialog] = useState(false);
-  const [selectedDateRange, setSelectedDateRange] = useState<string>(pkg?.dates ? `${pkg.dates.start}-${pkg.dates.end}` : '');
+  const [selectedDateRange, setSelectedDateRange] = useState<string>(
+    pkg?.dates ? `${pkg.dates.start}-${pkg.dates.end}` : ''
+  );
 
-  // Define the rating and reviews variables
-  const rating = 4.7; // Default rating value
-  const reviews = 143; // Default number of reviews
-
+  const rating = 4.7;
+  const reviews = 143;
   const host = mockUsers.find(user => user.id === pkg?.createdBy);
 
-  // Define available date ranges (this would typically come from your API/data)
   const availableDates = [
     { start: '2025-05-01', end: '2025-05-07' },
     { start: '2025-05-15', end: '2025-05-21' },
@@ -82,38 +80,6 @@ const BookPackage = () => {
     setShowContactDialog(false);
   };
 
-  const renderStars = (rating: number) => {
-    const stars = [];
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 >= 0.5;
-
-    for (let i = 0; i < fullStars; i++) {
-      stars.push(
-        <Star key={`full-${i}`} className="h-5 w-5 text-yellow-400 fill-yellow-400" />
-      );
-    }
-
-    if (hasHalfStar) {
-      stars.push(
-        <div key="half" className="relative">
-          <Star className="h-5 w-5 text-gray-300 fill-gray-300" />
-          <div className="absolute inset-0 overflow-hidden w-[50%]">
-            <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
-          </div>
-        </div>
-      );
-    }
-
-    const remainingStars = 5 - stars.length;
-    for (let i = 0; i < remainingStars; i++) {
-      stars.push(
-        <Star key={`empty-${i}`} className="h-5 w-5 text-gray-300 fill-gray-300" />
-      );
-    }
-
-    return stars;
-  };
-
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-travel-50 to-travel-100">
       <Header />
@@ -129,181 +95,89 @@ const BookPackage = () => {
 
         <div className="flex flex-col lg:flex-row gap-8">
           <div className="flex-1">
-            <ScrollArea className="h-[calc(100vh-200px)]">
-              <div className="pr-4">
-                <div className="relative mb-6">
-                  <img 
-                    src={pkg.images[selectedImageIndex]} 
-                    alt={pkg.title}
-                    className="w-full rounded-xl aspect-video object-cover"
-                  />
-                  
-                  {pkg.images.length > 1 && (
-                    <div className="mt-4">
-                      <Carousel>
-                        <CarouselContent>
-                          {pkg.images.map((image, index) => (
-                            <CarouselItem key={index} className="basis-1/4 sm:basis-1/5 lg:basis-1/6">
-                              <button
-                                onClick={() => setSelectedImageIndex(index)}
-                                className={`w-full rounded-lg overflow-hidden border-2 ${
-                                  selectedImageIndex === index 
-                                    ? 'border-travel-500' 
-                                    : 'border-transparent'
-                                }`}
-                              >
-                                <img
-                                  src={image}
-                                  alt={`${pkg.title} photo ${index + 1}`}
-                                  className="w-full aspect-square object-cover"
-                                />
-                              </button>
-                            </CarouselItem>
-                          ))}
-                        </CarouselContent>
-                        <CarouselPrevious className="left-0" />
-                        <CarouselNext className="right-0" />
-                      </Carousel>
-                    </div>
-                  )}
-                </div>
+            <ImageCarousel
+              images={pkg.images}
+              selectedImageIndex={selectedImageIndex}
+              onImageSelect={setSelectedImageIndex}
+            />
 
-                <div className="flex items-center justify-between mb-4">
-                  <h1 className="text-3xl font-bold text-gray-900">{pkg.title}</h1>
-                  <Button 
-                    variant="ghost" 
-                    size="icon"
-                    className="hover:text-travel-600"
-                    onClick={handleShare}
-                  >
-                    <Share2 className="h-5 w-5" />
-                  </Button>
-                </div>
-                
-                <div className="flex items-center justify-between text-gray-600 mb-6">
-                  <div className="flex items-center">
-                    <MapPin className="mr-2 h-5 w-5" />
-                    {pkg.location}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <div className="flex items-center">
-                      {renderStars(rating)}
-                    </div>
-                    <span className="font-medium ml-2">{rating}</span>
-                    <span className="text-gray-500">({reviews} reviews)</span>
-                  </div>
-                </div>
-
-                <Card className="p-4 mb-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-12 w-12">
-                        <AvatarImage src={host?.profileImage} alt={host?.name} />
-                        <AvatarFallback>
-                          <User className="h-6 w-6" />
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <h3 className="font-medium">Hosted by</h3>
-                        <Link 
-                          to={`/guides/${host?.id}`} 
-                          className="text-travel-600 hover:text-travel-800"
-                        >
-                          {host?.name}
-                        </Link>
-                      </div>
-                    </div>
-                    <Dialog open={showContactDialog} onOpenChange={setShowContactDialog}>
-                      <DialogTrigger asChild>
-                        <Button variant="outline" className="gap-2">
-                          <Mail className="h-4 w-4" />
-                          Contact Host
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Contact {host?.name}</DialogTitle>
-                        </DialogHeader>
-                        <div className="space-y-4 pt-4">
-                          <p className="text-gray-600">
-                            Send a message to {host?.name} for more information about this experience.
-                          </p>
-                          <Button 
-                            className="w-full bg-travel-500 hover:bg-travel-600"
-                            onClick={handleContact}
-                          >
-                            Send Message
-                          </Button>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                  </div>
-                </Card>
-
-                <div className="space-y-6 mb-8">
-                  <Card className="p-4">
-                    <h2 className="font-semibold text-lg mb-3">Trip Details</h2>
-                    <div className="space-y-3">
-                      <div className="flex items-start">
-                        <Calendar className="mr-3 h-5 w-5 text-travel-500 mt-0.5" />
-                        <div className="flex-1">
-                          <h3 className="font-medium mb-2">Date</h3>
-                          <Select
-                            value={selectedDateRange}
-                            onValueChange={setSelectedDateRange}
-                          >
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder="Select your travel dates" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {availableDates.map((dates, index) => (
-                                <SelectItem 
-                                  key={index} 
-                                  value={`${dates.start}-${dates.end}`}
-                                >
-                                  {formatDateRange(dates.start, dates.end)}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-start">
-                        <Users className="mr-3 h-5 w-5 text-travel-500 mt-0.5" />
-                        <div>
-                          <h3 className="font-medium">Group Size</h3>
-                          <p className="text-gray-600">
-                            {pkg?.capacity ? `Up to ${pkg.capacity} people` : 'Not specified'}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </Card>
-
-                  <Card className="p-4">
-                    <h2 className="font-semibold text-lg mb-3">About This Experience</h2>
-                    <p className="text-gray-600 whitespace-pre-line">{pkg.description}</p>
-                  </Card>
-
-                  {pkg.images.length > 1 && (
-                    <Card className="p-4">
-                      <h2 className="font-semibold text-lg mb-3">Photos</h2>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        {pkg.images.slice(1).map((image, index) => (
-                          <img 
-                            key={index}
-                            src={image}
-                            alt={`${pkg.title} photo ${index + 2}`}
-                            className="w-full aspect-square object-cover rounded-lg"
-                          />
-                        ))}
-                      </div>
-                    </Card>
-                  )}
-                </div>
+            <div className="flex items-center justify-between mb-4">
+              <h1 className="text-3xl font-bold text-gray-900">{pkg.title}</h1>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                className="hover:text-travel-600"
+                onClick={handleShare}
+              >
+                <Share2 className="h-5 w-5" />
+              </Button>
+            </div>
+            
+            <div className="flex items-center justify-between text-gray-600 mb-6">
+              <div className="flex items-center">
+                <MapPin className="mr-2 h-5 w-5" />
+                {pkg.location}
               </div>
-            </ScrollArea>
+              <RatingDisplay rating={rating} reviews={reviews} />
+            </div>
+
+            <Card className="p-4 mb-6">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-12 w-12">
+                    <AvatarImage src={host?.profileImage} alt={host?.name} />
+                    <AvatarFallback>
+                      <User className="h-6 w-6" />
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h3 className="font-medium">Hosted by</h3>
+                    <Link 
+                      to={`/guides/${host?.id}`} 
+                      className="text-travel-600 hover:text-travel-800"
+                    >
+                      {host?.name}
+                    </Link>
+                  </div>
+                </div>
+                <Dialog open={showContactDialog} onOpenChange={setShowContactDialog}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="gap-2">
+                      <Mail className="h-4 w-4" />
+                      Contact Host
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Contact {host?.name}</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 pt-4">
+                      <p className="text-gray-600">
+                        Send a message to {host?.name} for more information about this experience.
+                      </p>
+                      <Button 
+                        className="w-full bg-travel-500 hover:bg-travel-600"
+                        onClick={handleContact}
+                      >
+                        Send Message
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </Card>
+
+            <BookingInformation
+              pkg={pkg}
+              selectedDateRange={selectedDateRange}
+              setSelectedDateRange={setSelectedDateRange}
+              availableDates={availableDates}
+            />
+
+            <Card className="p-4">
+              <h2 className="font-semibold text-lg mb-3">About This Experience</h2>
+              <p className="text-gray-600 whitespace-pre-line">{pkg.description}</p>
+            </Card>
           </div>
 
           <div className="lg:w-80 shrink-0">
