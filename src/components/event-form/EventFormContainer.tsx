@@ -1,4 +1,3 @@
-
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,7 +11,7 @@ import EventFormFields, { EventFormValues, eventFormSchema } from '@/components/
 import CreditRequirementAlert from '@/components/event-form/CreditRequirementAlert';
 import VerificationAlert from '@/components/event-form/VerificationAlert';
 import SubmissionSuccessDialog from '@/components/event-form/SubmissionSuccessDialog';
-import { useEventSubmission } from './hooks/useEventSubmission';
+import { useEventSubmission, EVENT_SUBMISSION_COST } from './hooks/useEventSubmission';
 import EventFormActions from './EventFormActions';
 import { useState } from 'react';
 
