@@ -42,7 +42,7 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-travel-100 to-travel-200 p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-travel-700">TravelConnect</h1>
+          <h1 className="text-3xl font-bold text-travel-700">Travel2Connect</h1>
           <p className="text-travel-600">Connect with local guides and experiences</p>
         </div>
         
@@ -105,3 +105,4 @@ const Login = () => {
 };
 
 export default Login;
+

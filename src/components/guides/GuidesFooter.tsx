@@ -12,10 +12,10 @@ const GuidesFooter = () => {
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
               </svg>
             </div>
-            <span className="font-bold text-travel-700">TravelConnect</span>
+            <span className="font-bold text-travel-700">Travel2Connect</span>
           </div>
           <div className="text-center sm:text-right text-sm text-gray-500">
-            <p>© 2025 TravelConnect. All rights reserved.</p>
+            <p>© 2025 Travel2Connect. All rights reserved.</p>
           </div>
         </div>
       </div>
@@ -24,3 +24,4 @@ const GuidesFooter = () => {
 };
 
 export default GuidesFooter;
+
