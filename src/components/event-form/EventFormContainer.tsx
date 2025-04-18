@@ -90,20 +90,8 @@ const EventFormContainer = ({ formType, setFormType }: EventFormContainerProps) 
     }, 1500);
   };
 
-  const handleImageUpload = () => {
-    const placeholderImages = [
-      'https://images.unsplash.com/photo-1649972904349-6e44c42644a7',
-      'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b',
-      'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158',
-      'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5',
-      'https://images.unsplash.com/photo-1605810230434-7631ac76ec81'
-    ];
-    
-    const randomImage = placeholderImages[Math.floor(Math.random() * placeholderImages.length)];
-    
-    if (!selectedImages.includes(randomImage)) {
-      setSelectedImages([...selectedImages, randomImage]);
-    }
+  const handleImageUpload = (imageUrl: string) => {
+    setSelectedImages([...selectedImages, imageUrl]);
   };
 
   const handleDeleteImage = (imageUrl: string) => {
