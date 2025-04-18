@@ -12,7 +12,7 @@ export type Database = {
       event_packages: {
         Row: {
           capacity: number | null
-          category: string
+          category: Database["public"]["Enums"]["package_category"]
           created_at: string
           creator_id: string | null
           description: string
@@ -28,7 +28,7 @@ export type Database = {
         }
         Insert: {
           capacity?: number | null
-          category: string
+          category: Database["public"]["Enums"]["package_category"]
           created_at?: string
           creator_id?: string | null
           description: string
@@ -44,7 +44,7 @@ export type Database = {
         }
         Update: {
           capacity?: number | null
-          category?: string
+          category?: Database["public"]["Enums"]["package_category"]
           created_at?: string
           creator_id?: string | null
           description?: string
@@ -118,7 +118,14 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      package_category:
+        | "travel"
+        | "clubs"
+        | "events"
+        | "services"
+        | "guide"
+        | "rental"
+        | "tours"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -233,6 +240,16 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      package_category: [
+        "travel",
+        "clubs",
+        "events",
+        "services",
+        "guide",
+        "rental",
+        "tours",
+      ],
+    },
   },
 } as const

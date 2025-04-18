@@ -15,6 +15,7 @@ export const useEventSubmission = () => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [submittedData, setSubmittedData] = useState<EventFormValues | null>(null);
 
   const handleSubmit = async (data: EventFormValues, selectedImages: string[]) => {
     setIsSubmitting(true);
@@ -34,6 +35,9 @@ export const useEventSubmission = () => {
     }
     
     try {
+      // Save the data for the success dialog
+      setSubmittedData(data);
+      
       // Insert the event package
       const { error } = await supabase
         .from('event_packages')
@@ -92,6 +96,7 @@ export const useEventSubmission = () => {
     showSuccessDialog,
     setShowSuccessDialog,
     handleSubmit,
-    user
+    user,
+    submittedData
   };
 };

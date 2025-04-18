@@ -33,6 +33,11 @@ interface EventFormFieldsProps {
 const EventFormFields = ({ form, formType }: EventFormFieldsProps) => {
   const isOpenForPlanning = form.watch('isOpenForPlanning');
 
+  // Update formType in the form whenever it changes
+  if (form.getValues('formType') !== formType) {
+    form.setValue('formType', formType);
+  }
+
   return (
     <>
       <TitleField form={form} formType={formType} />

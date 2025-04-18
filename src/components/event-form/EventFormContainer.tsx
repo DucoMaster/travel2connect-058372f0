@@ -1,3 +1,4 @@
+
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,8 +23,7 @@ interface EventFormContainerProps {
 
 const EventFormContainer = ({ formType, setFormType }: EventFormContainerProps) => {
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
-  const [submittedEventData, setSubmittedEventData] = useState<EventFormValues | null>(null);
-  const { isSubmitting, showSuccessDialog, setShowSuccessDialog, handleSubmit: submitEvent, user } = useEventSubmission();
+  const { isSubmitting, showSuccessDialog, setShowSuccessDialog, handleSubmit: submitEvent, user, submittedData } = useEventSubmission();
   
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventFormSchema),
@@ -37,26 +37,30 @@ const EventFormContainer = ({ formType, setFormType }: EventFormContainerProps) 
       isOpenForPlanning: false,
       capacity: 1,
       imageUrls: [],
-      formType: 'travel',
+      formType: formType, // Initialize with current formType
     },
   });
 
+  // Update form value when formType changes
+  useState(() => {
+    form.setValue('formType', formType);
+  }, [formType, form]);
+
   const onSubmit = async (data: EventFormValues) => {
     data.formType = formType;
-    setSubmittedEventData(data);
     await submitEvent(data, selectedImages);
   };
 
   const handleSuccessDialogClose = () => {
     setShowSuccessDialog(false);
-    setSubmittedEventData(null);
-    window.location.href = '/';
   };
 
   const handleSubmitAnother = () => {
     setShowSuccessDialog(false);
-    setSubmittedEventData(null);
-    form.reset();
+    form.reset({
+      ...form.formState.defaultValues,
+      formType: formType,
+    });
     setSelectedImages([]);
   };
 
@@ -113,10 +117,10 @@ const EventFormContainer = ({ formType, setFormType }: EventFormContainerProps) 
         isOpen={showSuccessDialog}
         onClose={handleSuccessDialogClose}
         onSubmitAnother={handleSubmitAnother}
-        eventData={{
-          ...submittedEventData,
+        eventData={submittedData ? {
+          ...submittedData,
           imageUrls: selectedImages,
-        }}
+        } : undefined}
       />
     </>
   );
