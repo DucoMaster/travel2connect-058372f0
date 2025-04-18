@@ -14,7 +14,7 @@ import VerificationAlert from '@/components/event-form/VerificationAlert';
 import SubmissionSuccessDialog from '@/components/event-form/SubmissionSuccessDialog';
 import { useEventSubmission, EVENT_SUBMISSION_COST } from './hooks/useEventSubmission';
 import EventFormActions from './EventFormActions';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface EventFormContainerProps {
   formType: FormType;
@@ -42,7 +42,7 @@ const EventFormContainer = ({ formType, setFormType }: EventFormContainerProps) 
   });
 
   // Update form value when formType changes
-  useState(() => {
+  useEffect(() => {
     form.setValue('formType', formType);
   }, [formType, form]);
 
