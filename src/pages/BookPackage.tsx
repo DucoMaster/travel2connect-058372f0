@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Package } from '@/types';
@@ -19,6 +20,10 @@ const BookPackage = () => {
   const { toast } = useToast();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [showContactDialog, setShowContactDialog] = useState(false);
+
+  // Define the rating and reviews variables
+  const rating = 4.7; // Default rating value
+  const reviews = 143; // Default number of reviews
 
   const host = mockUsers.find(user => user.id === pkg?.createdBy);
 
