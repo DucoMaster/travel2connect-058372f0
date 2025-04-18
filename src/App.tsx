@@ -72,6 +72,7 @@ const App = () => {
               
               {/* Package routes */}
               <Route path="/packages/:id" element={<PackageDetail />} />
+              <Route path="/packages/:id/book" element={<BookPackage />} />
               
               {/* Catch-all route */}
               <Route path="*" element={<NotFound />} />
