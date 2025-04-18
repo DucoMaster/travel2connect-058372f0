@@ -22,6 +22,7 @@ interface EventFormContainerProps {
 
 const EventFormContainer = ({ formType, setFormType }: EventFormContainerProps) => {
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
+  const [submittedEventData, setSubmittedEventData] = useState<EventFormValues | null>(null);
   const { isSubmitting, showSuccessDialog, setShowSuccessDialog, handleSubmit: submitEvent, user } = useEventSubmission();
   
   const form = useForm<EventFormValues>({
@@ -42,16 +43,19 @@ const EventFormContainer = ({ formType, setFormType }: EventFormContainerProps) 
 
   const onSubmit = async (data: EventFormValues) => {
     data.formType = formType;
+    setSubmittedEventData(data);
     await submitEvent(data, selectedImages);
   };
 
   const handleSuccessDialogClose = () => {
     setShowSuccessDialog(false);
+    setSubmittedEventData(null);
     window.location.href = '/';
   };
 
   const handleSubmitAnother = () => {
     setShowSuccessDialog(false);
+    setSubmittedEventData(null);
     form.reset();
     setSelectedImages([]);
   };
@@ -109,6 +113,10 @@ const EventFormContainer = ({ formType, setFormType }: EventFormContainerProps) 
         isOpen={showSuccessDialog}
         onClose={handleSuccessDialogClose}
         onSubmitAnother={handleSubmitAnother}
+        eventData={{
+          ...submittedEventData,
+          imageUrls: selectedImages,
+        }}
       />
     </>
   );
