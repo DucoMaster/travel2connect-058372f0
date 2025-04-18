@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Package } from '@/types';
@@ -11,6 +10,8 @@ import { Card } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from '@/components/ui/carousel';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { format } from 'date-fns';
 import Header from '@/components/Header';
 import { useToast } from '@/hooks/use-toast';
 
@@ -20,12 +21,21 @@ const BookPackage = () => {
   const { toast } = useToast();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [showContactDialog, setShowContactDialog] = useState(false);
+  const [selectedDateRange, setSelectedDateRange] = useState<string>(pkg?.dates ? `${pkg.dates.start}-${pkg.dates.end}` : '');
 
   // Define the rating and reviews variables
   const rating = 4.7; // Default rating value
   const reviews = 143; // Default number of reviews
 
   const host = mockUsers.find(user => user.id === pkg?.createdBy);
+
+  // Define available date ranges (this would typically come from your API/data)
+  const availableDates = [
+    { start: '2025-05-01', end: '2025-05-07' },
+    { start: '2025-05-15', end: '2025-05-21' },
+    { start: '2025-06-01', end: '2025-06-07' },
+    { start: '2025-06-15', end: '2025-06-21' },
+  ];
 
   if (!pkg) {
     return (
@@ -236,9 +246,26 @@ const BookPackage = () => {
                     <div className="space-y-3">
                       <div className="flex items-start">
                         <Calendar className="mr-3 h-5 w-5 text-travel-500 mt-0.5" />
-                        <div>
-                          <h3 className="font-medium">Date</h3>
-                          <p className="text-gray-600">{formatDateRange(pkg.dates.start, pkg.dates.end)}</p>
+                        <div className="flex-1">
+                          <h3 className="font-medium mb-2">Date</h3>
+                          <Select
+                            value={selectedDateRange}
+                            onValueChange={setSelectedDateRange}
+                          >
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Select your travel dates" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {availableDates.map((dates, index) => (
+                                <SelectItem 
+                                  key={index} 
+                                  value={`${dates.start}-${dates.end}`}
+                                >
+                                  {formatDateRange(dates.start, dates.end)}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </div>
                       </div>
                       
@@ -247,7 +274,7 @@ const BookPackage = () => {
                         <div>
                           <h3 className="font-medium">Group Size</h3>
                           <p className="text-gray-600">
-                            {pkg.capacity ? `Up to ${pkg.capacity} people` : 'Not specified'}
+                            {pkg?.capacity ? `Up to ${pkg.capacity} people` : 'Not specified'}
                           </p>
                         </div>
                       </div>
