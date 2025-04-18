@@ -1,18 +1,22 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Package } from '@/types';
 import { mockPackages } from '@/data';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MapPin, Calendar, Users, ArrowLeft } from 'lucide-react';
+import { MapPin, Calendar, Users, ArrowLeft, Star, Share2 } from 'lucide-react';
 import { formatDateRange } from '@/utils/PackageUtils';
 import { Card } from '@/components/ui/card';
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from '@/components/ui/carousel';
 import Header from '@/components/Header';
+import { useToast } from '@/hooks/use-toast';
 
 const BookPackage = () => {
   const { id } = useParams();
   const pkg = mockPackages.find(p => p.id === id);
+  const { toast } = useToast();
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   if (!pkg) {
     return (
@@ -29,6 +33,31 @@ const BookPackage = () => {
       </div>
     );
   }
+
+  const handleShare = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: pkg.title,
+          text: pkg.description,
+          url: window.location.href,
+        });
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        toast({
+          description: "Link copied to clipboard!",
+        });
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        description: "Failed to share",
+      });
+    }
+  };
+
+  const rating = 4.97; // This would come from your backend in a real app
+  const reviews = 143; // This would come from your backend in a real app
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-travel-50 to-travel-100">
@@ -48,17 +77,65 @@ const BookPackage = () => {
           <div className="flex-1">
             <ScrollArea className="h-[calc(100vh-200px)]">
               <div className="pr-4">
-                <img 
-                  src={pkg.images[0]} 
-                  alt={pkg.title}
-                  className="w-full rounded-xl aspect-video object-cover mb-6"
-                />
+                <div className="relative mb-6">
+                  <img 
+                    src={pkg.images[selectedImageIndex]} 
+                    alt={pkg.title}
+                    className="w-full rounded-xl aspect-video object-cover"
+                  />
+                  
+                  {pkg.images.length > 1 && (
+                    <div className="mt-4">
+                      <Carousel>
+                        <CarouselContent>
+                          {pkg.images.map((image, index) => (
+                            <CarouselItem key={index} className="basis-1/4 sm:basis-1/5 lg:basis-1/6">
+                              <button
+                                onClick={() => setSelectedImageIndex(index)}
+                                className={`w-full rounded-lg overflow-hidden border-2 ${
+                                  selectedImageIndex === index 
+                                    ? 'border-travel-500' 
+                                    : 'border-transparent'
+                                }`}
+                              >
+                                <img
+                                  src={image}
+                                  alt={`${pkg.title} photo ${index + 1}`}
+                                  className="w-full aspect-square object-cover"
+                                />
+                              </button>
+                            </CarouselItem>
+                          ))}
+                        </CarouselContent>
+                        <CarouselPrevious className="left-0" />
+                        <CarouselNext className="right-0" />
+                      </Carousel>
+                    </div>
+                  )}
+                </div>
 
-                <h1 className="text-3xl font-bold text-gray-900 mb-4">{pkg.title}</h1>
+                <div className="flex items-center justify-between mb-4">
+                  <h1 className="text-3xl font-bold text-gray-900">{pkg.title}</h1>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className="hover:text-travel-600"
+                    onClick={handleShare}
+                  >
+                    <Share2 className="h-5 w-5" />
+                  </Button>
+                </div>
                 
-                <div className="flex items-center text-gray-600 mb-6">
-                  <MapPin className="mr-2 h-5 w-5" />
-                  {pkg.location}
+                <div className="flex items-center justify-between text-gray-600 mb-6">
+                  <div className="flex items-center">
+                    <MapPin className="mr-2 h-5 w-5" />
+                    {pkg.location}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
+                    <span className="font-medium">{rating}</span>
+                    <span className="text-gray-500">({reviews})</span>
+                  </div>
                 </div>
 
                 <div className="space-y-6 mb-8">
