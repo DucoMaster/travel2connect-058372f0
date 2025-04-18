@@ -42,4 +42,3 @@ const SubmissionSuccessDialog = ({
 };
 
 export default SubmissionSuccessDialog;
-
