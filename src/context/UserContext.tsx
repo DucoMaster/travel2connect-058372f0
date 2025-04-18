@@ -1,5 +1,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { User as SupabaseUser, Session } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
 import { User, UserRole } from '@/types';
 
 interface UserContextType {
@@ -8,44 +10,93 @@ interface UserContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, role: UserRole) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Check for stored user on mount
+  // Initialize auth state
   useEffect(() => {
-    const storedUser = localStorage.getItem('traveler-user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setIsLoading(false);
+    // Set up auth state listener first
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, currentSession) => {
+        setSession(currentSession);
+        
+        if (currentSession?.user) {
+          // Defer Supabase call with setTimeout to prevent deadlocks
+          setTimeout(() => {
+            fetchUserProfile(currentSession.user);
+          }, 0);
+        } else {
+          setUser(null);
+        }
+      }
+    );
+
+    // Then check for existing session
+    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      setSession(currentSession);
+      
+      if (currentSession?.user) {
+        fetchUserProfile(currentSession.user);
+      } else {
+        setIsLoading(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  // Mock login function
+  const fetchUserProfile = async (supabaseUser: SupabaseUser) => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', supabaseUser.id)
+        .single();
+
+      if (error) {
+        console.error('Error fetching user profile:', error);
+        setUser(null);
+      } else if (data) {
+        setUser({
+          id: data.id,
+          email: data.email,
+          role: data.role as UserRole,
+          credits: data.credits,
+          ranking: data.ranking,
+          name: data.name || undefined,
+          location: data.location || undefined,
+          profileImage: data.profile_image || undefined,
+          description: data.description || undefined,
+          specialties: data.specialties || undefined,
+          createdAt: new Date(data.created_at)
+        });
+      }
+    } catch (error) {
+      console.error('Error in profile fetch:', error);
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      // In a real app, this would call an API
-      // For now, we'll just simulate a login
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Create a mock user
-      const newUser: User = {
-        id: '1',
+      const { error } = await supabase.auth.signInWithPassword({
         email,
-        role: 'traveler' as UserRole, // Explicitly cast as UserRole
-        credits: 100,
-        ranking: 5,
-        createdAt: new Date()
-      };
+        password,
+      });
       
-      setUser(newUser);
-      localStorage.setItem('traveler-user', JSON.stringify(newUser));
+      if (error) throw error;
+      // User state will be set by the onAuthStateChange listener
     } catch (error) {
       console.error('Login failed:', error);
       throw error;
@@ -54,26 +105,23 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // Mock register function
   const register = async (email: string, password: string, role: UserRole) => {
     setIsLoading(true);
     try {
-      // In a real app, this would call an API
-      // For now, we'll just simulate registration
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Create a new user
-      const newUser: User = {
-        id: '1',
+      // First register the user
+      const { error } = await supabase.auth.signUp({
         email,
-        role, // This is already of type UserRole
-        credits: 100, // All new users get 100 credits
-        ranking: 5,   // All new users start with 5-star ranking
-        createdAt: new Date()
-      };
+        password,
+        options: {
+          data: {
+            role: role
+          }
+        }
+      });
       
-      setUser(newUser);
-      localStorage.setItem('traveler-user', JSON.stringify(newUser));
+      if (error) throw error;
+      // The trigger we created will handle creating the profile
+      // and onAuthStateChange will update our local state
     } catch (error) {
       console.error('Registration failed:', error);
       throw error;
@@ -82,9 +130,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('traveler-user');
+  const logout = async () => {
+    try {
+      await supabase.auth.signOut();
+      // User state will be set by the onAuthStateChange listener
+    } catch (error) {
+      console.error('Logout failed:', error);
+      throw error;
+    }
   };
 
   const value = {

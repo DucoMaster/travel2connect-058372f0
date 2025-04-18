@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@/context/UserContext';
 import { useToast } from '@/hooks/use-toast';
-import { UserRole } from '@/types';
+import { supabase } from '@/integrations/supabase/client';
 
 // Import step components
 import BasicInformationStep from './components/BasicInformationStep';
@@ -17,13 +17,13 @@ const CreateProfile = () => {
   const navigate = useNavigate();
   
   const [step, setStep] = useState(1);
-  const [name, setName] = useState('');
-  const [location, setLocation] = useState('');
+  const [name, setName] = useState(user?.name || '');
+  const [location, setLocation] = useState(user?.location || '');
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(user?.profileImage || null);
   const [questionAnswers, setQuestionAnswers] = useState<string[]>(['', '', '', '', '']);
   const [aiDescription, setAiDescription] = useState('');
-  const [editedDescription, setEditedDescription] = useState('');
+  const [editedDescription, setEditedDescription] = useState(user?.description || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
@@ -53,18 +53,32 @@ const CreateProfile = () => {
 
     setIsSubmitting(true);
     try {
-      // In a real app, this would call an API to save the profile
-      // For now, we'll just update the local user state
       if (user) {
+        // Update the profile in Supabase
+        const { error } = await supabase
+          .from('profiles')
+          .update({
+            name,
+            location,
+            profile_image: selectedImage,
+            description: editedDescription,
+            specialties: questionAnswers.filter(a => a)
+          })
+          .eq('id', user.id);
+        
+        if (error) throw error;
+        
+        // Update local user state
         const updatedUser = {
           ...user,
           name,
           location,
           profileImage: selectedImage,
           description: editedDescription,
+          specialties: questionAnswers.filter(a => a)
         };
+        
         setUser(updatedUser);
-        localStorage.setItem('traveler-user', JSON.stringify(updatedUser));
       }
       
       toast({
@@ -74,6 +88,7 @@ const CreateProfile = () => {
       
       navigate('/');
     } catch (error) {
+      console.error('Profile update error:', error);
       toast({
         title: 'Profile creation failed',
         description: 'Please try again later.',

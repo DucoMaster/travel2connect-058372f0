@@ -9,20 +9,29 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const UserMenu = () => {
   const { user, logout } = useUser();
   const navigate = useNavigate();
   
-  const handleLogout = () => {
-    logout();
-    navigate('/');
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
   
   const getUserInitials = () => {
-    if (!user || !user.email) return "U";
-    return user.email.charAt(0).toUpperCase();
+    if (user?.name) {
+      return user.name.split(' ').map(n => n[0]).join('').toUpperCase();
+    }
+    if (user?.email) {
+      return user.email.charAt(0).toUpperCase();
+    }
+    return "U";
   };
   
   if (!user) {
@@ -55,6 +64,9 @@ const UserMenu = () => {
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" className="rounded-full">
             <Avatar className="h-8 w-8">
+              {user.profileImage && (
+                <AvatarImage src={user.profileImage} alt={user.name || user.email} />
+              )}
               <AvatarFallback className="bg-travel-500 text-white">
                 {getUserInitials()}
               </AvatarFallback>
