@@ -1,53 +1,84 @@
-
 import { useMemo } from 'react';
-import { User, Package } from '@/types';
-import { mockPackages, mockUsers } from '@/data';
+import {
+  useEventPackagesByGuides,
+  useGuidePackages,
+  useGuides
+} from '@/actions/guide-quries';
 
 export const useGuideData = (
   searchTerm: string,
   selectedLocation: string,
   selectedRanking: string
 ) => {
-  // Get all guides from users array
-  const guides = useMemo(() => {
-    return mockUsers.filter(user => user.role === 'guide');
-  }, []);
-  
-  // Get all locations from guides
-  const locations = useMemo(() => {
-    const uniqueLocations = new Set(guides.map(guide => guide.location).filter(Boolean) as string[]);
+  // Fetch all guides
+  const {
+    data: guides,
+    isLoading: isGuidesLoading,
+    isError: isGuidesError,
+    error: guidesError,
+  } = useGuides();
+
+  // Fetch all guide packages
+  const {
+    data: guidePackages,
+    isLoading: isGuidePackagesLoading,
+    isError: isGuidePackagesError,
+    error: guidePackagesError,
+  } = useGuidePackages();
+
+  // Fetch event packages by guide IDs (only if guides are available)
+  const {
+    data: eventPackagesMap = {},
+    isLoading: isEventPackagesLoading,
+    isError: isEventPackagesError,
+    error: eventPackagesError,
+  } = useEventPackagesByGuides(guides?.map((guide: any) => guide.id) || []);
+
+  const isLoading = isGuidesLoading || isGuidePackagesLoading || isEventPackagesLoading;
+  const isError = isGuidesError || isGuidePackagesError || isEventPackagesError;
+
+  const error =
+    guidesError?.message ||
+    guidePackagesError?.message ||
+    eventPackagesError?.message ||
+    null;
+
+  // 🔽 Get unique locations
+  const locations: string[] = useMemo(() => {
+    if (!guides) return [];
+    const uniqueLocations = new Set(guides.map(g => g.location).filter(Boolean));
     return Array.from(uniqueLocations).sort();
   }, [guides]);
-  
-  // Get guide packages
-  const guidePackages = useMemo(() => {
-    return mockPackages.filter(pkg => pkg.category === 'guide' || pkg.creatorRole === 'guide');
-  }, []);
-  
-  // Create a map of guides with their packages
+
+  // 🔽 Attach packages and event packages to each guide
   const guidesWithPackages = useMemo(() => {
-    return guides.map(guide => {
-      const packages = guidePackages.filter(pkg => pkg.createdBy === guide.id);
-      return { ...guide, packages };
+    if (!guides) return [];
+    return guides.map((guide) => {
+      const packages = guidePackages?.filter((pkg) => pkg?.creator_id === guide.id) || [];
+      const eventPackages = eventPackagesMap[guide.id] || [];
+      return { ...guide, packages, eventPackages };
     });
-  }, [guides, guidePackages]);
-  
-  // Filter guides based on search term, location, and ranking
+  }, [guides, guidePackages, eventPackagesMap]);
+
+  // 🔽 Apply filtering
   const filteredGuides = useMemo(() => {
-    return guidesWithPackages.filter(guide => {
-      const matchesSearch = 
+    return guidesWithPackages?.filter((guide) => {
+      const matchesSearch =
         (guide.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
         (guide.description?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
         (guide.location?.toLowerCase() || '').includes(searchTerm.toLowerCase());
-      
+
       const matchesLocation = !selectedLocation || guide.location === selectedLocation;
       const matchesRanking = selectedRanking === 'all' || guide.ranking >= parseInt(selectedRanking);
-      
+
       return matchesSearch && matchesLocation && matchesRanking;
     });
   }, [guidesWithPackages, searchTerm, selectedLocation, selectedRanking]);
 
   return {
+    isLoading,
+    isError,
+    error,
     guides,
     locations,
     guidePackages,

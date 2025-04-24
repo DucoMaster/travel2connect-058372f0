@@ -1,39 +1,60 @@
-
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form } from '@/components/ui/form';
-import { FormType } from '@/components/event-form/FormTypeSelector';
-import FormTypeSelector from '@/components/event-form/FormTypeSelector';
-import ImageUploadSection from '@/components/event-form/ImageUploadSection';
-import ReviewNotice from '@/components/event-form/ReviewNotice';
-import FormFooter from '@/components/event-form/FormFooter';
-import EventFormFields, { EventFormValues, eventFormSchema } from '@/components/event-form/EventFormFields';
-import CreditRequirementAlert from '@/components/event-form/CreditRequirementAlert';
-import VerificationAlert from '@/components/event-form/VerificationAlert';
-import SubmissionSuccessDialog from '@/components/event-form/SubmissionSuccessDialog';
-import { useEventSubmission, EVENT_SUBMISSION_COST } from './hooks/useEventSubmission';
-import EventFormActions from './EventFormActions';
-import { useState, useEffect } from 'react';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Form } from "@/components/ui/form";
+import { FormType } from "@/components/event-form/FormTypeSelector";
+import FormTypeSelector from "@/components/event-form/FormTypeSelector";
+import ImageUploadSection from "@/components/event-form/ImageUploadSection";
+import ReviewNotice from "@/components/event-form/ReviewNotice";
+import FormFooter from "@/components/event-form/FormFooter";
+import EventFormFields, {
+  EventFormValues,
+  eventFormSchema,
+} from "@/components/event-form/EventFormFields";
+import CreditRequirementAlert from "@/components/event-form/CreditRequirementAlert";
+import VerificationAlert from "@/components/event-form/VerificationAlert";
+import SubmissionSuccessDialog from "@/components/event-form/SubmissionSuccessDialog";
+import {
+  useEventSubmission,
+  EVENT_SUBMISSION_COST,
+} from "./hooks/useEventSubmission";
+import EventFormActions from "./EventFormActions";
+import { useState, useEffect } from "react";
 
 interface EventFormContainerProps {
   formType: FormType;
   setFormType: (type: FormType) => void;
 }
 
-const EventFormContainer = ({ formType, setFormType }: EventFormContainerProps) => {
+const EventFormContainer = ({
+  formType,
+  setFormType,
+}: EventFormContainerProps) => {
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
-  const { isSubmitting, showSuccessDialog, setShowSuccessDialog, handleSubmit: submitEvent, user, submittedData } = useEventSubmission();
-  
+  const {
+    isSubmitting,
+    showSuccessDialog,
+    setShowSuccessDialog,
+    handleSubmit: submitEvent,
+    user,
+    submittedData,
+  } = useEventSubmission();
+
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventFormSchema),
     defaultValues: {
-      title: '',
-      description: '',
-      location: '',
+      title: "",
+      description: "",
+      location: "",
       price: 0,
-      startDate: '',
-      endDate: '',
+      startDate: "",
+      endDate: "",
       isOpenForPlanning: false,
       capacity: 1,
       imageUrls: [],
@@ -43,7 +64,7 @@ const EventFormContainer = ({ formType, setFormType }: EventFormContainerProps) 
 
   // Update form value when formType changes
   useEffect(() => {
-    form.setValue('formType', formType);
+    form.setValue("formType", formType);
   }, [formType, form]);
 
   const onSubmit = async (data: EventFormValues) => {
@@ -69,9 +90,9 @@ const EventFormContainer = ({ formType, setFormType }: EventFormContainerProps) 
   };
 
   const handleDeleteImage = (imageUrl: string) => {
-    setSelectedImages(selectedImages.filter(url => url !== imageUrl));
+    setSelectedImages(selectedImages.filter((url) => url !== imageUrl));
   };
-  
+
   return (
     <>
       <Card className="max-w-3xl mx-auto bg-white">
@@ -81,7 +102,8 @@ const EventFormContainer = ({ formType, setFormType }: EventFormContainerProps) 
             Select the type of event you want to submit and fill out the form.
             {!user && (
               <div className="mt-2 text-red-500">
-                Note: You must be logged in to submit an event. Your draft will not be saved.
+                Note: You must be logged in to submit an event. Your draft will
+                not be saved.
               </div>
             )}
             <FormTypeSelector formType={formType} setFormType={setFormType} />
@@ -89,20 +111,23 @@ const EventFormContainer = ({ formType, setFormType }: EventFormContainerProps) 
         </CardHeader>
         <CardContent>
           <ReviewNotice />
-          <CreditRequirementAlert cost={EVENT_SUBMISSION_COST} userCredits={user?.credits || 0} />
+          <CreditRequirementAlert
+            cost={EVENT_SUBMISSION_COST}
+            userCredits={user?.credits || 0}
+          />
           <VerificationAlert />
-          
+
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <EventFormFields form={form} formType={formType} />
-              
-              <ImageUploadSection 
+
+              <ImageUploadSection
                 selectedImages={selectedImages}
                 onImageUpload={handleImageUpload}
                 onImageDelete={handleDeleteImage}
               />
-              
-              <EventFormActions 
+
+              <EventFormActions
                 isSubmitting={isSubmitting}
                 userCredits={user?.credits}
                 formType={formType}
@@ -112,15 +137,19 @@ const EventFormContainer = ({ formType, setFormType }: EventFormContainerProps) 
         </CardContent>
         <FormFooter formType={formType} />
       </Card>
-      
-      <SubmissionSuccessDialog 
+
+      <SubmissionSuccessDialog
         isOpen={showSuccessDialog}
         onClose={handleSuccessDialogClose}
         onSubmitAnother={handleSubmitAnother}
-        eventData={submittedData ? {
-          ...submittedData,
-          imageUrls: selectedImages,
-        } : undefined}
+        eventData={
+          submittedData
+            ? {
+                ...submittedData,
+                imageUrls: selectedImages,
+              }
+            : undefined
+        }
       />
     </>
   );

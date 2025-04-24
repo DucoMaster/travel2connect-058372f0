@@ -1,7 +1,7 @@
 
 // User roles
 export type UserRole = 'traveler' | 'guide' | 'agent' | 'venue';
-
+export type TabType = "travel" | "clubs" | "events" | "services" | "guide" | "rental" | "tours"
 // User interface
 export interface User {
   id: string;
@@ -13,7 +13,7 @@ export interface User {
   description?: string;
   credits: number;
   ranking: number;
-  createdAt: Date;
+  created_at: string;
   specialties?: string[];
 }
 
@@ -22,7 +22,7 @@ export interface Package {
   id: string;
   title: string;
   description: string;
-  category: 'travel' | 'clubs' | 'events' | 'services' | 'guide' | 'rental' | 'tours';
+  category: TabType;
   location: string;
   price: number; // in credits
   dates: {

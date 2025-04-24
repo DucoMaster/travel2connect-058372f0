@@ -1,30 +1,36 @@
-
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { 
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
-} from '@/components/ui/form';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
-import { useUser } from '@/context/UserContext';
-import { useToast } from '@/hooks/use-toast';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { UserRole } from '@/types';
+  FormMessage,
+} from "@/components/ui/form";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { useUser } from "@/context/UserContext";
+import { useToast } from "@/hooks/use-toast";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { UserRole } from "@/types";
 
 const registerSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-  role: z.enum(['traveler', 'guide', 'agent', 'venue'] as const),
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  role: z.enum(["traveler", "guide", "agent", "venue"] as const),
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
@@ -38,47 +44,48 @@ const Register = () => {
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      email: '',
-      password: '',
-      role: 'traveler',
+      email: "",
+      password: "",
+      role: "traveler",
     },
   });
-
   const onSubmit = async (values: RegisterFormValues) => {
     setIsSubmitting(true);
 
     try {
       await register(values.email, values.password, values.role as UserRole);
       toast({
-        title: 'Registration successful',
-        description: 'Your account has been created. Please check your email to verify your account.',
+        title: "Registration successful",
+        description:
+          "Your account has been created. Please check your email to verify your account.",
       });
-      navigate('/');
+      navigate("/");
     } catch (error) {
-      let errorMessage = 'Registration failed. Please try again.';
-      
+      let errorMessage = "Registration failed. Please try again.";
+
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-      
+
       toast({
-        title: 'Registration failed',
+        title: "Registration failed",
         description: errorMessage,
-        variant: 'destructive',
+        variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
     }
   };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-travel-100 to-travel-200 p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-travel-700">Travel2Connect</h1>
-          <p className="text-travel-600">Join our community of travelers and guides</p>
+          <p className="text-travel-600">
+            Join our community of travelers and guides
+          </p>
         </div>
-        
+
         <Card>
           <CardHeader>
             <CardTitle className="text-2xl">Create an account</CardTitle>
@@ -86,7 +93,10 @@ const Register = () => {
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-6"
+              >
                 <FormField
                   control={form.control}
                   name="email"
@@ -104,7 +114,7 @@ const Register = () => {
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={form.control}
                   name="password"
@@ -122,7 +132,7 @@ const Register = () => {
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={form.control}
                   name="role"
@@ -137,19 +147,30 @@ const Register = () => {
                         >
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="traveler" id="traveler" />
-                            <Label htmlFor="traveler" className="cursor-pointer">Traveler</Label>
+                            <Label
+                              htmlFor="traveler"
+                              className="cursor-pointer"
+                            >
+                              Traveler
+                            </Label>
                           </div>
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="guide" id="guide" />
-                            <Label htmlFor="guide" className="cursor-pointer">Guide</Label>
+                            <Label htmlFor="guide" className="cursor-pointer">
+                              Guide
+                            </Label>
                           </div>
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="agent" id="agent" />
-                            <Label htmlFor="agent" className="cursor-pointer">Travel Agent</Label>
+                            <Label htmlFor="agent" className="cursor-pointer">
+                              Travel Agent
+                            </Label>
                           </div>
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="venue" id="venue" />
-                            <Label htmlFor="venue" className="cursor-pointer">Venue Owner</Label>
+                            <Label htmlFor="venue" className="cursor-pointer">
+                              Venue Owner
+                            </Label>
                           </div>
                         </RadioGroup>
                       </FormControl>
@@ -157,21 +178,24 @@ const Register = () => {
                     </FormItem>
                   )}
                 />
-                
-                <Button 
-                  type="submit" 
+
+                <Button
+                  type="submit"
                   className="w-full bg-travel-500 hover:bg-travel-600"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? 'Creating account...' : 'Create account'}
+                  {isSubmitting ? "Creating account..." : "Create account"}
                 </Button>
               </form>
             </Form>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <div className="text-center text-sm">
-              Already have an account?{' '}
-              <Link to="/login" className="text-travel-600 hover:text-travel-800 font-medium">
+              Already have an account?{" "}
+              <Link
+                to="/login"
+                className="text-travel-600 hover:text-travel-800 font-medium"
+              >
                 Login
               </Link>
             </div>

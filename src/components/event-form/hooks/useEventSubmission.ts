@@ -19,10 +19,10 @@ export const useEventSubmission = () => {
 
   const handleSubmit = async (data: EventFormValues, selectedImages: string[]) => {
     setIsSubmitting(true);
-    
+
     // Set the form type and images
     data.imageUrls = selectedImages;
-    
+
     // Check if user has enough credits
     if (!user || user.credits < EVENT_SUBMISSION_COST) {
       toast({
@@ -33,11 +33,11 @@ export const useEventSubmission = () => {
       setIsSubmitting(false);
       return;
     }
-    
+
     try {
       // Save the data for the success dialog
       setSubmittedData(data);
-      
+
       // Insert the event package
       const { error } = await supabase
         .from('event_packages')
@@ -72,7 +72,7 @@ export const useEventSubmission = () => {
           credits: user.credits - EVENT_SUBMISSION_COST
         });
       }
-      
+
       setShowSuccessDialog(true);
       toast({
         title: "Credits spent",
