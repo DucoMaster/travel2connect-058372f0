@@ -16,6 +16,23 @@ export function useGuides() {
         },
     });
 }
+export function useGuideById(id: string) {
+    return useQuery({
+        queryKey: ['guide', id],
+        queryFn: async () => {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', id)
+                .eq('role', 'guide')
+                .single();
+
+            if (error) throw new Error('Guide not found');
+            return data as User;
+        },
+        enabled: !!id,
+    });
+}
 export function useGuidePackages() {
     return useQuery({
         queryKey: ['guide-packages'],

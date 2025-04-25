@@ -1,18 +1,19 @@
-import React from 'react';
-import { Package } from '@/types';
-import { Button } from '@/components/ui/button';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogFooter, 
-  DialogHeader, 
-  DialogTitle 
-} from '@/components/ui/dialog';
-import { formatDateRange } from '@/utils/PackageUtils';
+import React from "react";
+import { Package } from "@/types";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { formatDateRange } from "@/utils/PackageUtils";
+import { EventPackageDetails } from "@/types/event-packages";
 
 interface BookingDialogProps {
-  pkg: Package;
+  pkg: EventPackageDetails;
   open: boolean;
   userCredits: number;
   isProcessing: boolean;
@@ -28,7 +29,7 @@ const BookingDialog = ({
   isProcessing,
   formatDate,
   onOpenChange,
-  onConfirm
+  onConfirm,
 }: BookingDialogProps) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -48,7 +49,10 @@ const BookingDialog = ({
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">Date</span>
               <span className="font-medium">
-                {formatDateRange(pkg?.dates.start, pkg?.dates.end)}
+                {formatDateRange(
+                  new Date(pkg?.start_date),
+                  new Date(pkg?.end_date)
+                )}
               </span>
             </div>
             <div className="flex justify-between text-sm">
@@ -61,18 +65,22 @@ const BookingDialog = ({
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">Balance after booking</span>
-              <span className="font-medium">{(userCredits || 0) - pkg?.price} credits</span>
+              <span className="font-medium">
+                {(userCredits || 0) - pkg?.price} credits
+              </span>
             </div>
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button 
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button
             className="bg-travel-500 hover:bg-travel-600"
             disabled={isProcessing || userCredits < pkg?.price}
             onClick={onConfirm}
           >
-            {isProcessing ? 'Processing...' : 'Confirm Booking'}
+            {isProcessing ? "Processing..." : "Confirm Booking"}
           </Button>
         </DialogFooter>
       </DialogContent>

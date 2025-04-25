@@ -35,3 +35,35 @@ export const useFilteredPackages = (
         enabled: !!activeTab,
     });
 };
+
+export function usePackagesByGuideId(guideId: string) {
+    return useQuery({
+        queryKey: ['packages-by-guide', guideId],
+        queryFn: async () => {
+            const { data, error } = await supabase
+                .from('event_packages')
+                .select('*')
+                .eq('creator_id', guideId);
+
+            if (error) throw new Error('Error fetching packages for this guide');
+            return data as EventPackageDetails[];
+        },
+        enabled: !!guideId,
+    });
+}
+export function useEventPackageById(id: string | undefined) {
+    return useQuery({
+        queryKey: ['event-package', id],
+        enabled: !!id,
+        queryFn: async () => {
+            const { data, error } = await supabase
+                .from('event_packages')
+                .select('*')
+                .eq('id', id)
+                .single(); // since we're fetching a single package
+
+            if (error) throw new Error('Error fetching package');
+            return data as EventPackageDetails;
+        },
+    });
+}
