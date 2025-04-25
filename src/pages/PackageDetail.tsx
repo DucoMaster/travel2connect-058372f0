@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { mockPackages } from "@/data";
 import { useUser } from "@/context/UserContext";
@@ -15,15 +15,21 @@ import PackageNotFound from "@/components/package/PackageNotFound";
 import PackageOwnerStats from "@/components/package/PackageOwnerStats";
 import PackageOwnerActions from "@/components/package/PackageOwnerActions";
 import { formatDate } from "@/utils/PackageUtils";
-import { useEventPackageById } from "@/actions/package-queries";
+import {
+  useEventPackageById,
+  useVisitorsByPackage,
+} from "@/actions/package-queries";
 import { Spinner } from "@/components/spinner";
+import { supabase } from "@/integrations/supabase/client";
+import { UserRoundIcon } from "lucide-react";
 
 const PackageDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { user, setUser } = useUser();
   const { toast } = useToast();
   const navigate = useNavigate();
-
+  const { data: packageVisitors, isLoading: isPackageVisitorLoading } =
+    useVisitorsByPackage(id);
   const [packages, setPackages] = useState(mockPackages);
   const [showBookDialog, setShowBookDialog] = useState(false);
   const [showApplyDialog, setShowApplyDialog] = useState(false);
@@ -32,13 +38,47 @@ const PackageDetail = () => {
 
   // const pkg = packages.find((p) => p.id === id);
   const { data: pkg, isLoading, error } = useEventPackageById(id);
-  const isOwner = user && user.id === pkg.creator_id;
+  const isOwner = user && user?.id === pkg?.creator_id;
 
-  const handleBook = () => {
+  const handleApply = async () => {
+    if (!user || !pkg?.id) return;
+
     setIsProcessing(true);
 
-    setTimeout(() => {
-      if (user && user.credits >= pkg.price) {
+    try {
+      // 1. Check if the booking already exists
+      const { data: existingBooking, error: bookingCheckError } = await supabase
+        .from("event_package_booking")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("event_package_id", pkg.id)
+        .single();
+
+      if (existingBooking) {
+        throw new Error(`You've already applied to guide for ${pkg.title}.`);
+      }
+
+      // 2. Check if the user has enough credits
+      if (user.credits >= pkg.price) {
+        // Update the user's credits
+        const { error: creditError } = await supabase
+          .from("profiles")
+          .update({ credits: user.credits - pkg.price })
+          .eq("id", user.id);
+
+        if (creditError) throw new Error(creditError.message);
+
+        // 3. Create a booking in event_package_booking
+        const { error: bookingError } = await supabase
+          .from("event_package_booking")
+          .insert({
+            user_id: user.id,
+            event_package_id: pkg.id,
+          });
+
+        if (bookingError) throw new Error(bookingError.message);
+
+        // Update the user state after booking
         const updatedUser = {
           ...user,
           credits: user.credits - pkg.price,
@@ -46,64 +86,115 @@ const PackageDetail = () => {
         setUser(updatedUser);
         localStorage.setItem("traveler-user", JSON.stringify(updatedUser));
 
-        toast({
-          title: "Booking Successful",
-          description: `You've booked ${pkg.title} for ${pkg.price} credits.`,
-        });
-        setShowBookDialog(false);
-        navigate("/");
-      } else {
-        toast({
-          title: "Booking Failed",
-          description: "You don't have enough credits for this booking.",
-          variant: "destructive",
-        });
-      }
-      setIsProcessing(false);
-    }, 1500);
-  };
-
-  const handleApply = () => {
-    setIsProcessing(true);
-
-    setTimeout(() => {
-      if (user && user.credits >= 10) {
-        const updatedUser = {
-          ...user,
-          credits: user.credits - 10,
-        };
-        setUser(updatedUser);
-        localStorage.setItem("traveler-user", JSON.stringify(updatedUser));
-
+        // Show success notification
         toast({
           title: "Application Submitted",
           description: `You've applied to guide for ${pkg.title}.`,
         });
+
         setShowApplyDialog(false);
         navigate("/");
       } else {
         toast({
           title: "Application Failed",
-          description:
-            "You don't have enough credits to apply (10 credits required).",
+          description: `You don't have enough credits to apply (${pkg.price} credits required).`,
           variant: "destructive",
         });
       }
+    } catch (err: any) {
+      toast({
+        title: "Something went wrong",
+        description: err.message || "Unable to apply for this package.",
+        variant: "destructive",
+      });
+    } finally {
       setIsProcessing(false);
-    }, 1500);
+    }
   };
+  const handleDeletePackageBooking = async (packageId: string) => {
+    try {
+      // 1. Delete bookings related to the package
+      const { error: bookingError } = await supabase
+        .from("event_package_booking")
+        .delete()
+        .eq("event_package_id", packageId);
 
-  const handleDeletePackage = (packageId: string) => {
-    // In a real app, this would call an API to delete the package
-    const updatedPackages = packages.filter((p) => p.id !== packageId);
-    setPackages(updatedPackages);
+      if (bookingError) {
+        throw new Error(bookingError.message);
+      }
+      const updatedPackages = packages.filter((p) => p.id !== packageId);
+      setPackages(updatedPackages);
+      toast({
+        title: "Cancelled Booking",
+        description: `You've cancelled the booking for ${pkg.title}.`,
+      });
+    } catch (err: any) {
+      toast({
+        title: "Deletion Failed",
+        description: err.message || "Failed to delete package or its bookings.",
+        variant: "destructive",
+      });
+    }
   };
-  if (pkg) {
-    // Simulate tracking a visit - in a real app, this would be in useEffect
-    // and would call an API to record the visit
-    // pkg.visitors += 1;
-  }
-  if (isLoading) {
+  const handleDeletePackage = async (packageId: string) => {
+    try {
+      const { error: packageError } = await supabase
+        .from("event_packages")
+        .delete()
+        .eq("id", packageId);
+
+      if (packageError) {
+        throw new Error(packageError.message);
+      }
+      const updatedPackages = packages.filter((p) => p.id !== packageId);
+      setPackages(updatedPackages);
+      toast({
+        title: "Package Deleted",
+        description: "The package and its bookings were successfully deleted.",
+      });
+    } catch (err: any) {
+      // Error Toast
+      toast({
+        title: "Deletion Failed",
+        description:
+          err.message || "Failed to delete the package and its bookings.",
+        variant: "destructive",
+      });
+    }
+  };
+  const addEventPackageVisitor = async (userId: string, packageId: string) => {
+    try {
+      // Check if already exists
+      const { data: existing, error: checkError } = await supabase
+        .from("event_package_visitors")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("event_package_id", packageId)
+        .maybeSingle();
+
+      if (checkError) throw checkError;
+
+      // Only insert if not already exists
+      if (!existing) {
+        const { error: insertError } = await supabase
+          .from("event_package_visitors")
+          .insert({ user_id: userId, event_package_id: packageId });
+
+        if (insertError) throw insertError;
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error("Failed to add visitor:", error);
+      return { success: false, error };
+    }
+  };
+  useEffect(() => {
+    if (user && id) {
+      addEventPackageVisitor(user?.id, id);
+    }
+  }, [user, id]);
+  if (isLoading || isPackageVisitorLoading) {
     <div className="flex items-center justify-center h-screen w-full">
       <Spinner />
     </div>;
@@ -156,7 +247,7 @@ const PackageDetail = () => {
         isProcessing={isProcessing}
         formatDate={formatDate}
         onOpenChange={setShowBookDialog}
-        onConfirm={handleBook}
+        onConfirm={handleApply}
       />
 
       <GuideApplyDialog

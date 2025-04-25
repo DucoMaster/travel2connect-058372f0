@@ -98,12 +98,12 @@ const PackageCard = ({ pkg }: { pkg: EventPackageDetails }) => {
         <div className="mt-3 flex items-center text-xs text-muted-foreground">
           <Calendar className="mr-1 h-3.5 w-3.5" />
           {pkg?.start_date && pkg?.end_date ? (
-            new Date(pkg.start_date).getTime() ===
-            new Date(pkg.end_date).getTime() ? (
-              formatDate(new Date(pkg.start_date))
+            new Date(pkg?.start_date || "").getTime() ===
+            new Date(pkg?.end_date || "").getTime() ? (
+              formatDate(new Date(pkg?.start_date || ""))
             ) : (
-              `${formatDate(new Date(pkg.start_date))} - ${formatDate(
-                new Date(pkg.end_date)
+              `${formatDate(new Date(pkg?.start_date || ""))} - ${formatDate(
+                new Date(pkg?.end_date || "")
               )}`
             )
           ) : (
@@ -113,7 +113,7 @@ const PackageCard = ({ pkg }: { pkg: EventPackageDetails }) => {
         {pkg.capacity && (
           <div className="mt-1 flex items-center text-xs text-muted-foreground">
             <Users className="mr-1 h-3.5 w-3.5" />
-            <span>Max {pkg.capacity} people</span>
+            <span>Max {pkg?.capacity} people</span>
           </div>
         )}
       </CardContent>

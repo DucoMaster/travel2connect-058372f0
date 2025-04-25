@@ -67,3 +67,47 @@ export function useEventPackageById(id: string | undefined) {
         },
     });
 }
+export const useVisitorsByPackage = (packageId: string | undefined) => {
+    return useQuery({
+        queryKey: ['visitors', packageId],
+        queryFn: async () => {
+            if (!packageId) throw new Error('No package ID provided');
+            const { data, error } = await supabase
+                .from('event_package_visitors')
+                .select(`
+          id,
+          created_at,
+          user_id,
+          user:profiles (
+            id,
+            name,
+            profile_image
+          )
+        `)
+                .eq('event_package_id', packageId);
+
+            if (error) throw new Error(error.message);
+            return data;
+        },
+        enabled: !!packageId,
+        staleTime: 1000 * 60 * 5,
+    });
+};
+export const useIsPackageBooked = (packageId: string) => {
+    return useQuery(
+        {
+            queryKey: ['package-booked', packageId],
+            queryFn: async () => {
+                const { data, error } = await supabase
+                    .from('event_package_booking')
+                    .select('id')
+                    .eq('event_package_id', packageId)
+                    .single();
+                if (error) throw new Error(error.message);
+                return !!data;
+            },
+            enabled: !!packageId,
+            staleTime: 1000 * 60 * 5,
+        }
+    );
+};

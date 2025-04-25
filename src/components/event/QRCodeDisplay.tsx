@@ -1,15 +1,14 @@
-
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { QrCode, Download, Share2 } from 'lucide-react';
-
-// Simple function to generate a QR code URL using the Google Charts API
-// In a production app, consider using a dedicated QR code library
-const generateQRCodeUrl = (data: string, size = 200) => {
-  const encodedData = encodeURIComponent(data);
-  return `https://chart.googleapis.com/chart?cht=qr&chl=${encodedData}&chs=${size}x${size}&choe=UTF-8&chld=L|2`;
-};
+import React from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { QrCode, Download, Share2 } from "lucide-react";
+import { QRCodeCanvas } from "qrcode.react"; // Import the QRCode component
 
 interface QRCodeDisplayProps {
   eventId: string;
@@ -17,28 +16,35 @@ interface QRCodeDisplayProps {
   attendeeId?: string; // Optional: to create unique QR codes per attendee
 }
 
-const QRCodeDisplay = ({ eventId, eventTitle, attendeeId }: QRCodeDisplayProps) => {
+const QRCodeDisplay = ({
+  eventId,
+  eventTitle,
+  attendeeId,
+}: QRCodeDisplayProps) => {
   // Create a unique data string for the QR code
-  // Include timestamp to ensure uniqueness if needed
   const qrData = JSON.stringify({
     event: eventId,
     title: eventTitle,
-    attendee: attendeeId || 'general',
+    attendee: attendeeId || "general", // Default to 'general' if no attendeeId is passed
     timestamp: new Date().toISOString(),
   });
-  
-  const qrCodeUrl = generateQRCodeUrl(qrData);
-  
+
   // Function to download the QR code
   const handleDownload = () => {
-    const link = document.createElement('a');
-    link.href = qrCodeUrl;
-    link.download = `${eventTitle.replace(/\s+/g, '-')}-qrcode.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const canvas = document.getElementById(
+      "qr-code-canvas"
+    ) as HTMLCanvasElement;
+    if (canvas) {
+      const dataUrl = canvas.toDataURL("image/png");
+      const link = document.createElement("a");
+      link.href = dataUrl;
+      link.download = `${eventTitle.replace(/\s+/g, "-")}-qrcode.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   };
-  
+
   // Function to share the QR code (simplified)
   const handleShare = async () => {
     if (navigator.share) {
@@ -49,19 +55,21 @@ const QRCodeDisplay = ({ eventId, eventTitle, attendeeId }: QRCodeDisplayProps) 
           url: window.location.href,
         });
       } catch (error) {
-        console.error('Error sharing:', error);
+        console.error("Error sharing:", error);
       }
     } else {
       // Fallback for browsers that don't support sharing
-      alert('Sharing is not supported on this browser. Please copy the URL manually.');
+      alert(
+        "Sharing is not supported on this browser. Please copy the URL manually."
+      );
     }
   };
-  
+
   return (
-    <Card className="w-full max-w-md mx-auto">
+    <Card className="w-full max-w-md mx-auto h-[80vh] overflow-auto">
       <CardHeader>
         <CardTitle className="flex items-center">
-          <QrCode className="mr-2 h-5 w-5" /> 
+          <QrCode className="mr-2 h-5 w-5" />
           Event Check-In Code
         </CardTitle>
         <CardDescription>
@@ -69,18 +77,27 @@ const QRCodeDisplay = ({ eventId, eventTitle, attendeeId }: QRCodeDisplayProps) 
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col items-center">
+        {/* Display the QR code using qrcode.react */}
         <div className="border border-gray-200 rounded-lg p-3 bg-white">
-          <img src={qrCodeUrl} alt={`QR Code for ${eventTitle}`} className="w-48 h-48" />
+          <QRCodeCanvas
+            id="qr-code-canvas"
+            value={qrData}
+            size={256}
+            level="L"
+          />
         </div>
-        
+
         <p className="mt-4 text-center text-sm text-gray-500">
-          Present this code to the event organizer or scan at the venue to check in
+          Present this code to the event organizer or scan at the venue to check
+          in
         </p>
-        
+
         <div className="flex gap-3 mt-4">
+          {/* Button to download the QR code */}
           <Button variant="outline" size="sm" onClick={handleDownload}>
             <Download className="mr-2 h-4 w-4" /> Save
           </Button>
+          {/* Button to share the QR code */}
           <Button variant="outline" size="sm" onClick={handleShare}>
             <Share2 className="mr-2 h-4 w-4" /> Share
           </Button>

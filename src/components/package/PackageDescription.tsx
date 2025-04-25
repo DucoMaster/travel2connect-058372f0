@@ -24,8 +24,8 @@ const PackageDescription = ({ pkg, formatDate }: PackageDescriptionProps) => {
             <h3 className="font-medium text-gray-900">Date</h3>
             <p className="text-gray-600">
               {formatDateRange(
-                new Date(pkg?.start_date),
-                new Date(pkg?.end_date)
+                new Date(pkg?.start_date || ""),
+                new Date(pkg?.end_date || "")
               )}
             </p>
           </div>

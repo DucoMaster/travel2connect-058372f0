@@ -54,7 +54,7 @@ const BookingSection = ({
                     className="w-full bg-coral-500 hover:bg-coral-600"
                     onClick={onApplyToGuide}
                   >
-                    Apply to Guide (10 credits)
+                    Apply to Guide ({pkg?.price || 0} credits)
                   </Button>
                 )}
 

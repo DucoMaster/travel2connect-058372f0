@@ -32,9 +32,21 @@ export const isSameDay = (start: Date, end: Date): boolean => {
  * @param end End date
  * @returns Formatted date range or single date if dates are the same
  */
-export const formatDateRange = (start: Date, end: Date): string => {
-  if (isSameDay(start, end)) {
-    return formatDate(start);
+const parseDate = (date?: Date | string | null): Date => {
+  const parsed = date ? new Date(date) : new Date();
+  return isNaN(parsed.getTime()) ? new Date() : parsed;
+};
+
+export const formatDateRange = (
+  start?: Date | string | null,
+  end?: Date | string | null
+): string => {
+  const validStart = parseDate(start);
+  const validEnd = parseDate(end ?? start);
+
+  if (isSameDay(validStart, validEnd)) {
+    return formatDate(validStart);
   }
-  return `${formatDate(start)} - ${formatDate(end)}`;
+
+  return `${formatDate(validStart)} - ${formatDate(validEnd)}`;
 };

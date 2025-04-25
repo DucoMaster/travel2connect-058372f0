@@ -50,8 +50,8 @@ const BookingDialog = ({
               <span className="text-gray-600">Date</span>
               <span className="font-medium">
                 {formatDateRange(
-                  new Date(pkg?.start_date),
-                  new Date(pkg?.end_date)
+                  new Date(pkg?.start_date || ""),
+                  new Date(pkg?.end_date || "")
                 )}
               </span>
             </div>

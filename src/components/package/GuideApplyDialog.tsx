@@ -31,7 +31,7 @@ const GuideApplyDialog = ({
   onOpenChange,
   onConfirm,
 }: GuideApplyDialogProps) => {
-  const applicationCost = 10; // Fixed application cost
+  const applicationCost = pkg?.price || 0; // Fixed application cost
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -53,8 +53,8 @@ const GuideApplyDialog = ({
               <span className="text-gray-600">Date</span>
               <span className="font-medium">
                 {formatDateRange(
-                  new Date(pkg?.start_date),
-                  new Date(pkg?.end_date)
+                  new Date(pkg?.start_date || ""),
+                  new Date(pkg?.end_date || "")
                 )}
               </span>
             </div>
