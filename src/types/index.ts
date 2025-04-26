@@ -15,6 +15,7 @@ export interface User {
   ranking: number;
   created_at: string;
   specialties?: string[];
+
 }
 
 // Tour/Event package

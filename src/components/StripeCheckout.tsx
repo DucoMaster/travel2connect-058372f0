@@ -12,6 +12,7 @@ import {
 import { Check, CreditCard, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/context/UserContext";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PriceTier {
   id: string;
@@ -29,6 +30,7 @@ const priceTiers: PriceTier[] = [
 
 export default function StripeCheckout() {
   const { user } = useUser();
+  console.log("This is user ", user);
   const [selectedTier, setSelectedTier] = useState<PriceTier | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -47,29 +49,53 @@ export default function StripeCheckout() {
     setIsLoading(true);
 
     try {
-      // This is a mock implementation. In a real app, this would call your Supabase Edge Function
-      // const { data, error } = await supabase.functions.invoke("create-payment", {
-      //   body: {
-      //     amount: selectedTier.price,
-      //     credits: selectedTier.credits
-      //   }
-      // });
+      // Await the result of getSession() to access the session data
+      const sessionResult = await supabase.auth.getSession();
 
-      // if (error) throw error;
-      // window.location.href = data.url;
+      // Check if session data exists and if there's a valid access_token
+      const accessToken = sessionResult.data?.session?.access_token;
 
-      // For this demo, we'll just simulate a payment process
-      setTimeout(() => {
-        toast({
-          title: "Payment process simulated",
-          description:
-            "In a real app, this would redirect to Stripe. Please set up Stripe Edge Functions in Supabase.",
-        });
-        setIsLoading(false);
+      if (!accessToken) {
+        throw new Error("User is not authenticated.");
+      }
 
-        // Redirect to Credits page after simulation
-        navigate("/credits");
-      }, 1500);
+      // Construct the products array
+      const products = [
+        {
+          name: selectedTier.id, // Use the selected tier name here
+          price: selectedTier.price * 100, // Convert price to cents (Stripe expects amounts in cents)
+          quantity: 1, // You can modify this based on the selected quantity
+        },
+      ];
+
+      const response = await fetch(
+        "https://lmwbccidogskuqsmqgtp.supabase.co/functions/v1/stripe-payment",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            originUrl: window.location.origin, // or a custom URL if needed
+            products, // Include the products array in the payload
+            userId: user?.id || 0,
+            credits: selectedTier?.price || 0,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Something went wrong.");
+      }
+
+      if (data.url) {
+        window.location.href = data.url; // Redirect to Stripe checkout
+      } else {
+        throw new Error("Stripe session URL missing.");
+      }
     } catch (error) {
       console.error("Payment error:", error);
       toast({
@@ -77,6 +103,7 @@ export default function StripeCheckout() {
         description: "There was an error initiating the payment process.",
         variant: "destructive",
       });
+    } finally {
       setIsLoading(false);
     }
   };

@@ -17,6 +17,9 @@ import GuideDetail from "./pages/GuideDetail";
 import SubmitEvent from "./pages/SubmitEvent";
 import QueryProvider from "./lib/query-provider";
 import { Spinner } from "./components/spinner";
+import Success from "./pages/Payment/success";
+import PackageNotFound from "./components/package/PackageNotFound";
+import PaymentError from "./pages/Payment/error";
 
 // Auth route guard for private routes
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -68,6 +71,23 @@ const App = () => {
                 element={
                   <ProtectedRoute>
                     <Credits />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/success"
+                element={
+                  <ProtectedRoute>
+                    <Success />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/error"
+                element={
+                  <ProtectedRoute>
+                    <PaymentError />
                   </ProtectedRoute>
                 }
               />

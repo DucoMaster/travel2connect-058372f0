@@ -81,7 +81,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
           profileImage: data.profile_image || undefined,
           description: data.description || undefined,
           specialties: data.specialties || undefined,
-          createdAt: new Date(data.created_at),
+          created_at: data.created_at
+            ? new Date(data.created_at)?.toDateString()
+            : "",
         });
       }
     } catch (error) {

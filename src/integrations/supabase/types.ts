@@ -182,6 +182,37 @@ export type Database = {
           }
         ]
       }
+      user_payments: {
+        Row: {
+          id: number
+          created_at: string
+          user_id: string | null
+          credits: number | null
+          payment_intent: string | null
+        }
+        Insert: {
+          user_id?: string | null
+          credits?: number | null
+          payment_intent?: string | null
+          created_at?: string
+        }
+        Update: {
+          user_id?: string | null
+          credits?: number | null
+          payment_intent?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_payments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+
 
     }
     Views: {
@@ -207,6 +238,28 @@ export type Database = {
 }
 
 type DefaultSchema = Database[Extract<keyof Database, "public">]
+export type TablesRow<
+  DefaultSchemaTableNameOrOptions extends
+  | keyof DefaultSchema["Tables"]
+  | { schema: keyof Database },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
+  }
+  ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+  : never = never,
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+    Row: infer R
+  }
+  ? R
+  : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+  ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+    Row: infer R
+  }
+  ? R
+  : never
+  : never
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
