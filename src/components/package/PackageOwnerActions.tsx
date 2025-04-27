@@ -54,13 +54,13 @@ const PackageOwnerActions = ({ pkg, onDelete }: PackageOwnerActionsProps) => {
 
   return (
     <div className="flex space-x-2 mt-4">
-      <Button
+      {/* <Button
         onClick={handleEdit}
         className="flex items-center gap-2 bg-travel-500 hover:bg-travel-600"
       >
         <Edit className="h-4 w-4" />
         Edit
-      </Button>
+      </Button> */}
       <Button
         onClick={handleDelete}
         variant="destructive"
