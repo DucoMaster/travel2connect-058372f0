@@ -38,7 +38,7 @@ const getRoleCTA = (
     case "traveler":
       return {
         text: "Book Now",
-        link: `/packages/${pkg.id}/book`,
+        link: `/packages/${pkg.id}`,
       };
     case "guide":
       return {

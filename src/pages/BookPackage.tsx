@@ -136,7 +136,7 @@ const BookPackage = () => {
                   className="w-full bg-travel-500 hover:bg-travel-600"
                   asChild
                 >
-                  <Link to={`/packages/${pkg.id}/book`}>Book Now</Link>
+                  <Link to={`/packages/${pkg.id}`}>Book Now</Link>
                 </Button>
               </Card>
             </div>
