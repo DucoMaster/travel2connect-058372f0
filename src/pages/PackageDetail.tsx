@@ -229,12 +229,14 @@ const PackageDetail = () => {
                 />
               </div>
 
-              <BookingSection
-                pkg={pkg}
-                user={user}
-                onBookNow={() => setShowBookDialog(true)}
-                onApplyToGuide={() => setShowApplyDialog(true)}
-              />
+              {!isOwner && (
+                <BookingSection
+                  pkg={pkg}
+                  user={user}
+                  onBookNow={() => setShowBookDialog(true)}
+                  onApplyToGuide={() => setShowApplyDialog(true)}
+                />
+              )}
             </div>
           </div>
         </div>

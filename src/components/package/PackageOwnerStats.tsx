@@ -1,12 +1,20 @@
 import { Eye, Users, CreditCard } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EventPackageDetails } from "@/types/event-packages";
+import {
+  usePackageStats,
+  useVisitorsByPackage,
+} from "@/actions/package-queries";
 
 interface PackageOwnerStatsProps {
   pkg: EventPackageDetails;
 }
 
 const PackageOwnerStats = ({ pkg }: PackageOwnerStatsProps) => {
+  const { data, isLoading } = useVisitorsByPackage(pkg.id);
+  const { data: pacageStats, isLoading: packageLoading } = usePackageStats(
+    pkg.id
+  );
   return (
     <Card className="mt-6 border-travel-100">
       <CardHeader className="pb-2">
@@ -19,13 +27,17 @@ const PackageOwnerStats = ({ pkg }: PackageOwnerStatsProps) => {
           <div className="flex flex-col items-center p-4 bg-travel-50 rounded-lg">
             <Eye className="h-6 w-6 text-travel-500 mb-2" />
             <h3 className="text-sm font-medium text-gray-600">Visitors</h3>
-            <p className="text-2xl font-bold text-travel-700">0</p>
+            <p className="text-2xl font-bold text-travel-700">
+              {data?.length || 0}
+            </p>
           </div>
 
           <div className="flex flex-col items-center p-4 bg-travel-50 rounded-lg">
             <Users className="h-6 w-6 text-travel-500 mb-2" />
             <h3 className="text-sm font-medium text-gray-600">Attendees</h3>
-            <p className="text-2xl font-bold text-travel-700">0</p>
+            <p className="text-2xl font-bold text-travel-700">
+              {pacageStats?.attendees || 0}
+            </p>
           </div>
 
           <div className="flex flex-col items-center p-4 bg-travel-50 rounded-lg">
@@ -33,7 +45,9 @@ const PackageOwnerStats = ({ pkg }: PackageOwnerStatsProps) => {
             <h3 className="text-sm font-medium text-gray-600">
               Credits Earned
             </h3>
-            <p className="text-2xl font-bold text-travel-700">0</p>
+            <p className="text-2xl font-bold text-travel-700">
+              {pacageStats?.credits_earned || 0}
+            </p>
           </div>
         </div>
       </CardContent>

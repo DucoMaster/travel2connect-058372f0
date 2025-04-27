@@ -111,3 +111,35 @@ export const useIsPackageBooked = (packageId: string) => {
         }
     );
 };
+const fetchPackageStats = async (eventPackageId: string) => {
+    // Get all bookings for this event package
+    const { data: bookings, error: bookingError } = await supabase
+        .from('event_package_booking')
+        .select('id')
+        .eq('event_package_id', eventPackageId);
+
+    if (bookingError) throw new Error(bookingError.message);
+
+    const attendees = bookings.length;
+
+    // Get the price of the package
+    const { data: packageData, error: packageError } = await supabase
+        .from('event_packages')
+        .select('price')
+        .eq('id', eventPackageId)
+        .single();
+
+    if (packageError) throw new Error(packageError.message);
+
+    const credits_earned = (packageData?.price || 0) * attendees;
+
+    return { credits_earned, attendees };
+};
+
+export const usePackageStats = (eventPackageId: string) => {
+    return useQuery({
+        queryKey: ['package-stats', eventPackageId],
+        queryFn: () => fetchPackageStats(eventPackageId),
+        enabled: !!eventPackageId,
+    });
+};
