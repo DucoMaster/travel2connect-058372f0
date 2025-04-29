@@ -14,7 +14,7 @@ export const mockUsers: User[] = [
     location: 'Rome, Italy',
     ranking: 5,
     specialties: ['history', 'architecture', 'food'],
-    createdAt: new Date('2024-01-15')
+    created_at: new Date('2024-01-15')
   },
   {
     id: 'guide2',
@@ -27,7 +27,7 @@ export const mockUsers: User[] = [
     location: 'Barcelona, Spain',
     ranking: 4,
     specialties: ['cooking', 'cuisine', 'markets'],
-    createdAt: new Date('2024-02-10')
+    created_at: new Date('2024-02-10')
   },
   {
     id: 'guide3',
@@ -40,7 +40,7 @@ export const mockUsers: User[] = [
     location: 'Tokyo, Japan',
     ranking: 5,
     specialties: ['nightlife', 'entertainment', 'local culture'],
-    createdAt: new Date('2024-01-05')
+    created_at: new Date('2024-01-05')
   },
   {
     id: 'agent1',
@@ -52,7 +52,7 @@ export const mockUsers: User[] = [
     description: 'Experienced travel agent specializing in luxury resort packages and all-inclusive getaways in exotic destinations.',
     location: 'New York, USA',
     ranking: 4,
-    createdAt: new Date('2023-11-20')
+    created_at: new Date('2023-11-20')
   },
   {
     id: 'agent2',
@@ -64,7 +64,7 @@ export const mockUsers: User[] = [
     description: 'Safari specialist with extensive knowledge of East African wildlife. I organize ethical and sustainable safari experiences that support local conservation efforts.',
     location: 'Nairobi, Kenya',
     ranking: 5,
-    createdAt: new Date('2023-12-15')
+    created_at: new Date('2023-12-15')
   },
   {
     id: 'venue1',
@@ -76,7 +76,7 @@ export const mockUsers: User[] = [
     description: 'Premium nightclub offering exclusive packages for international visitors. VIP access to the hottest parties in Tokyo.',
     location: 'Tokyo, Japan',
     ranking: 4,
-    createdAt: new Date('2023-10-05')
+    created_at: new Date('2023-10-05')
   },
   {
     id: 'venue2',
@@ -88,6 +88,6 @@ export const mockUsers: User[] = [
     description: 'Official provider of premium Broadway show packages including backstage tours and cast meet-and-greets.',
     location: 'New York, USA',
     ranking: 5,
-    createdAt: new Date('2023-09-18')
+    created_at: new Date('2023-09-18')
   }
 ];

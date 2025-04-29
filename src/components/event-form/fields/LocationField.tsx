@@ -67,7 +67,6 @@ const LocationField = ({ form }: LocationFieldProps) => {
                 onChange={handleInputChange}
                 onFocus={() => inputValue && setSuggestions(filterLocations(inputValue))}
                 {...field}
-                value={inputValue}
               />
               
               {isOpen && suggestions.length > 0 && (
