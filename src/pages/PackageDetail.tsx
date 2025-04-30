@@ -35,10 +35,33 @@ const PackageDetail = () => {
   const [showApplyDialog, setShowApplyDialog] = useState(false);
   const [showQRCodeDialog, setShowQRCodeDialog] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [bookingCount, setBookingCount] = useState<number>(0);
 
   // const pkg = packages.find((p) => p.id === id);
   const { data: pkg, isLoading, error } = useEventPackageById(id);
+
   const isOwner = user && user?.id === pkg?.creator_id;
+
+  const handleCapacity = async () => {
+    const { count, error } = await supabase
+      .from("event_package_booking")
+      .select("*", { count: "exact", head: true })
+      .eq("event_package_id", pkg.id);
+
+    if (error) {
+      console.error("Error fetching booking count:", error);
+      setBookingCount(0);
+    } else {
+      setBookingCount(count ?? 0);
+    }
+  };
+
+  useEffect(() => {
+    if (pkg?.id) {
+      handleCapacity();
+    }
+  }, [pkg?.id]);
+  
 
   const handleApply = async () => {
     if (!user || !pkg?.id) return;
@@ -235,6 +258,7 @@ const PackageDetail = () => {
                   user={user}
                   onBookNow={() => setShowBookDialog(true)}
                   onApplyToGuide={() => setShowApplyDialog(true)}
+                  bookingCount={bookingCount}
                 />
               )}
             </div>

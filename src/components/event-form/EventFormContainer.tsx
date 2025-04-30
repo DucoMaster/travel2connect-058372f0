@@ -93,6 +93,21 @@ const EventFormContainer = ({
     setSelectedImages(selectedImages.filter((url) => url !== imageUrl));
   };
 
+  function isUserProfileComplete(user: any): boolean {
+    if (!user) return false;
+    const requiredFields = [
+      "name",
+      "profileImage",
+      "location",
+      "description",
+      "specialties",
+    ];
+    return requiredFields.every(
+      (field) =>
+        user[field] !== undefined && user[field] !== null && user[field] !== ""
+    );
+  }
+
   return (
     <>
       <Card className="max-w-3xl mx-auto bg-white">
@@ -104,6 +119,12 @@ const EventFormContainer = ({
               <div className="mt-2 text-red-500">
                 Note: You must be logged in to submit an event. Your draft will
                 not be saved.
+              </div>
+            )}
+            {user && !isUserProfileComplete(user) && (
+              <div className="mt-2 text-red-500">
+                Please complete your profile (name, image, location,
+                description, specialties) before submitting an event.
               </div>
             )}
             <FormTypeSelector formType={formType} setFormType={setFormType} />
@@ -131,6 +152,7 @@ const EventFormContainer = ({
                 isSubmitting={isSubmitting}
                 userCredits={user?.credits}
                 formType={formType}
+                isUserProfileComplete={isUserProfileComplete(user)}
               />
             </form>
           </Form>
