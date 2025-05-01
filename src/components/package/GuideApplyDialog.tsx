@@ -19,7 +19,8 @@ interface GuideApplyDialogProps {
   isProcessing: boolean;
   formatDate: (date: Date) => string;
   onOpenChange: (open: boolean) => void;
-  onConfirm: () => void;
+  // onConfirm: () => void;
+  onConfirm: (bookingDates: string[]) => void;
 }
 
 const GuideApplyDialog = ({
@@ -81,7 +82,7 @@ const GuideApplyDialog = ({
           <Button
             className="bg-coral-500 hover:bg-coral-600"
             disabled={isProcessing || userCredits < applicationCost}
-            onClick={onConfirm}
+            // onClick={onConfirm}
           >
             {isProcessing ? "Processing..." : "Submit Application"}
           </Button>

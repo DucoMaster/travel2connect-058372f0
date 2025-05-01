@@ -22,6 +22,7 @@ import {
 import { Spinner } from "@/components/spinner";
 import { supabase } from "@/integrations/supabase/client";
 import { UserRoundIcon } from "lucide-react";
+import { convertToPST } from "@/utils/format-dates";
 
 const PackageDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -61,24 +62,55 @@ const PackageDetail = () => {
       handleCapacity();
     }
   }, [pkg?.id]);
-  
 
-  const handleApply = async () => {
+  const handleApply = async (bookingDates: string[]) => {
     if (!user || !pkg?.id) return;
 
     setIsProcessing(true);
 
+    const formattedDates = bookingDates.map((dateStr) =>
+      convertToPST(new Date(dateStr))
+    );
+
     try {
-      // 1. Check if the booking already exists
+      // 1. Check if a booking already exists for this user & package
       const { data: existingBooking, error: bookingCheckError } = await supabase
         .from("event_package_booking")
-        .select("id")
+        .select("id, booking_dates")
         .eq("user_id", user.id)
-        .eq("event_package_id", pkg.id)
-        .single();
+        .eq("event_package_id", pkg.id);
 
-      if (existingBooking) {
-        throw new Error(`You've already applied to guide for ${pkg.title}.`);
+      if (bookingCheckError) throw bookingCheckError;
+
+      const allExistingDates = new Set(
+        (existingBooking || [])
+          .flatMap((b) => b.booking_dates || [])
+          .map((d: string) => new Date(d).getTime())
+      );
+
+      const overlapping = formattedDates.filter((dateStr) =>
+        allExistingDates.has(new Date(dateStr).getTime())
+      );
+
+      if (overlapping.length > 0) {
+        const formatted = overlapping
+          .map((d) => new Date(d))
+          .sort((a, b) => a.getTime() - b.getTime());
+
+        const days = formatted.map((d) => d.getDate()).join(", ");
+        const monthYear = formatted[0].toLocaleDateString("en-US", {
+          month: "long",
+          year: "numeric",
+        });
+
+        toast({
+          title: "Booking Exists",
+          description: `You've already applied to guide for ${pkg.title} on ${days} ${monthYear}. Please choose different date(s).`,
+          variant: "destructive",
+        });
+
+        setIsProcessing(false);
+        return;
       }
 
       // 2. Check if the user has enough credits
@@ -97,6 +129,7 @@ const PackageDetail = () => {
           .insert({
             user_id: user.id,
             event_package_id: pkg.id,
+            booking_dates: formattedDates as unknown as string,
           });
 
         if (bookingError) throw new Error(bookingError.message);
@@ -134,6 +167,7 @@ const PackageDetail = () => {
       setIsProcessing(false);
     }
   };
+
   const handleDeletePackageBooking = async (packageId: string) => {
     try {
       // 1. Delete bookings related to the package

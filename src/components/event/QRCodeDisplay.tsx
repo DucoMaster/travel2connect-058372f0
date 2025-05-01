@@ -14,20 +14,34 @@ interface QRCodeDisplayProps {
   eventId: string;
   eventTitle: string;
   attendeeId?: string; // Optional: to create unique QR codes per attendee
+  eventStartDate?: string;
+  eventEndDate?: string;
+  title?: string;
 }
 
 const QRCodeDisplay = ({
   eventId,
   eventTitle,
   attendeeId,
+  eventStartDate,
+  eventEndDate,
+  title,
 }: QRCodeDisplayProps) => {
   // Create a unique data string for the QR code
-  const qrData = JSON.stringify({
-    event: eventId,
-    title: eventTitle,
-    attendee: attendeeId || "general", // Default to 'general' if no attendeeId is passed
-    timestamp: new Date().toISOString(),
-  });
+  // const qrData = JSON.stringify({
+  //   event: eventId,
+  //   title: eventTitle,
+  //   attendee: attendeeId || "general", // Default to 'general' if no attendeeId is passed
+  //   timestamp: new Date().toISOString(),
+  // });
+
+  const qrData = `${
+    window.location.origin
+  }/event-checkin?event=${eventId}&attendee=${
+    attendeeId || "general"
+  }&title={title}&start=${encodeURIComponent(
+    eventStartDate
+  )}&end=${encodeURIComponent(eventEndDate)}`;
 
   // Function to download the QR code
   const handleDownload = () => {
