@@ -1,1 +1,1 @@
-export const EMAIL_SERVER_URL = "https://travel-2-connect-backend.vercel.app/"
+export const EMAIL_SERVER_URL = "https://travel-2-connect-backend.vercel.app"
