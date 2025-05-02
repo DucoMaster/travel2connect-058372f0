@@ -23,6 +23,7 @@ import { Spinner } from "@/components/spinner";
 import { supabase } from "@/integrations/supabase/client";
 import { UserRoundIcon } from "lucide-react";
 import { convertToPST } from "@/utils/format-dates";
+import { EMAIL_SERVER_URL } from "@/utils/constants";
 
 const PackageDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -147,7 +148,7 @@ const PackageDetail = () => {
           title: "Application Submitted",
           description: `You've applied to guide for ${pkg.title}.`,
         });
-        await fetch("http://localhost:5000/api/email/send", {
+        await fetch(`${EMAIL_SERVER_URL}/api/email/send`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -156,7 +157,7 @@ const PackageDetail = () => {
             title: pkg.title,
             start: pkg.start_date,
             end: pkg.end_date,
-            booking_dates: formattedDates
+            booking_dates: formattedDates,
           }),
         });
         setShowApplyDialog(false);
