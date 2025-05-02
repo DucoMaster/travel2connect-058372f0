@@ -147,7 +147,18 @@ const PackageDetail = () => {
           title: "Application Submitted",
           description: `You've applied to guide for ${pkg.title}.`,
         });
-
+        await fetch("http://localhost:5000/api/email/send", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: pkg.title,
+            start: pkg.start_date,
+            end: pkg.end_date,
+            booking_dates: formattedDates
+          }),
+        });
         setShowApplyDialog(false);
         navigate("/");
       } else {
