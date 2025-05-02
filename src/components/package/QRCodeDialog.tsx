@@ -35,6 +35,9 @@ const QRCodeDialog = ({ pkg, user, open, onOpenChange }: QRCodeDialogProps) => {
             eventId={pkg.id}
             eventTitle={pkg.title}
             attendeeId={user?.id}
+            eventStartDate={pkg?.start_date}
+            eventEndDate={pkg?.end_date}
+            title={pkg?.title}
           />
         )}
 

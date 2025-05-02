@@ -22,6 +22,7 @@ import {
 import { Spinner } from "@/components/spinner";
 import { supabase } from "@/integrations/supabase/client";
 import { UserRoundIcon } from "lucide-react";
+import { convertToPST } from "@/utils/format-dates";
 
 const PackageDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -35,27 +36,81 @@ const PackageDetail = () => {
   const [showApplyDialog, setShowApplyDialog] = useState(false);
   const [showQRCodeDialog, setShowQRCodeDialog] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [bookingCount, setBookingCount] = useState<number>(0);
 
   // const pkg = packages.find((p) => p.id === id);
   const { data: pkg, isLoading, error } = useEventPackageById(id);
+
   const isOwner = user && user?.id === pkg?.creator_id;
 
-  const handleApply = async () => {
+  const handleCapacity = async () => {
+    const { count, error } = await supabase
+      .from("event_package_booking")
+      .select("*", { count: "exact", head: true })
+      .eq("event_package_id", pkg.id);
+
+    if (error) {
+      console.error("Error fetching booking count:", error);
+      setBookingCount(0);
+    } else {
+      setBookingCount(count ?? 0);
+    }
+  };
+
+  useEffect(() => {
+    if (pkg?.id) {
+      handleCapacity();
+    }
+  }, [pkg?.id]);
+
+  const handleApply = async (bookingDates: string[]) => {
     if (!user || !pkg?.id) return;
 
     setIsProcessing(true);
 
+    const formattedDates = bookingDates.map((dateStr) =>
+      convertToPST(new Date(dateStr))
+    );
+
     try {
-      // 1. Check if the booking already exists
+      // 1. Check if a booking already exists for this user & package
       const { data: existingBooking, error: bookingCheckError } = await supabase
         .from("event_package_booking")
-        .select("id")
+        .select("id, booking_dates")
         .eq("user_id", user.id)
-        .eq("event_package_id", pkg.id)
-        .single();
+        .eq("event_package_id", pkg.id);
 
-      if (existingBooking) {
-        throw new Error(`You've already applied to guide for ${pkg.title}.`);
+      if (bookingCheckError) throw bookingCheckError;
+
+      const allExistingDates = new Set(
+        (existingBooking || [])
+          .flatMap((b) => b.booking_dates || [])
+          .map((d: string) => new Date(d).getTime())
+      );
+
+      const overlapping = formattedDates.filter((dateStr) =>
+        allExistingDates.has(new Date(dateStr).getTime())
+      );
+
+      if (overlapping.length > 0) {
+        const formatted = overlapping
+          .map((d) => new Date(d))
+          .sort((a, b) => a.getTime() - b.getTime());
+
+        const days = formatted.map((d) => d.getDate()).join(", ");
+        const monthYear = formatted[0].toLocaleDateString("en-US", {
+          month: "long",
+          year: "numeric",
+        });
+
+        toast({
+          title: "Booking Exists",
+          description: `You've already applied to guide for ${pkg.title} on ${days} ${monthYear}. Please choose different date(s).`,
+          variant: "destructive",
+        });
+
+        setIsProcessing(false);
+        return;
       }
 
       // 2. Check if the user has enough credits
@@ -74,6 +129,7 @@ const PackageDetail = () => {
           .insert({
             user_id: user.id,
             event_package_id: pkg.id,
+            booking_dates: formattedDates as unknown as string,
           });
 
         if (bookingError) throw new Error(bookingError.message);
@@ -91,7 +147,18 @@ const PackageDetail = () => {
           title: "Application Submitted",
           description: `You've applied to guide for ${pkg.title}.`,
         });
-
+        await fetch("http://localhost:5000/api/email/send", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: pkg.title,
+            start: pkg.start_date,
+            end: pkg.end_date,
+            booking_dates: formattedDates
+          }),
+        });
         setShowApplyDialog(false);
         navigate("/");
       } else {
@@ -111,6 +178,7 @@ const PackageDetail = () => {
       setIsProcessing(false);
     }
   };
+
   const handleDeletePackageBooking = async (packageId: string) => {
     try {
       // 1. Delete bookings related to the package
@@ -235,6 +303,7 @@ const PackageDetail = () => {
                   user={user}
                   onBookNow={() => setShowBookDialog(true)}
                   onApplyToGuide={() => setShowApplyDialog(true)}
+                  bookingCount={bookingCount}
                 />
               )}
             </div>

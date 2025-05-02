@@ -20,6 +20,7 @@ import { Spinner } from "./components/spinner";
 import Success from "./pages/Payment/success";
 import PackageNotFound from "./components/package/PackageNotFound";
 import PaymentError from "./pages/Payment/error";
+import EventCheckIn from "./pages/EventCheckIn";
 
 // Auth route guard for private routes
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -95,6 +96,9 @@ const App = () => {
               {/* Package routes */}
               <Route path="/packages/:id" element={<PackageDetail />} />
               <Route path="/packages/:id/book" element={<BookPackage />} />
+
+              {/* QR code route */}
+              <Route path="/event-checkin" element={<EventCheckIn />} />
 
               {/* Catch-all route */}
               <Route path="*" element={<NotFound />} />

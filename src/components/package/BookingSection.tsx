@@ -1,14 +1,16 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Package, User } from "@/types";
 import { Button } from "@/components/ui/button";
 import { EventPackageDetails } from "@/types/event-packages";
+import { useToast } from "@/hooks/use-toast";
 
 interface BookingSectionProps {
   pkg: EventPackageDetails;
   user: User | null;
   onBookNow: () => void;
   onApplyToGuide: () => void;
+  bookingCount?: number;
 }
 
 const BookingSection = ({
@@ -16,7 +18,10 @@ const BookingSection = ({
   user,
   onBookNow,
   onApplyToGuide,
+  bookingCount,
 }: BookingSectionProps) => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
   return (
     <div className="lg:w-80 shrink-0">
       <div className="bg-travel-50 rounded-lg p-5 border border-travel-100">
@@ -43,7 +48,20 @@ const BookingSection = ({
                 {user.role === "traveler" && (
                   <Button
                     className="w-full bg-travel-500 hover:bg-travel-600"
-                    onClick={onBookNow}
+                    onClick={() => {
+                      if (user.credits < pkg?.price) {
+                        navigate("/credits");
+                      } else if (bookingCount >= pkg.capacity) {
+                        toast({
+                          title: "Event Fully Booked",
+                          description:
+                            "Sorry, this event has reached its booking capacity. Please check back later or explore other available packages.",
+                          variant: "destructive",
+                        });
+                      } else {
+                        onBookNow();
+                      }
+                    }}
                   >
                     Book Now
                   </Button>

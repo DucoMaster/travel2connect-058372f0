@@ -7,9 +7,10 @@ interface EventFormActionsProps {
   isSubmitting: boolean;
   userCredits?: number;
   formType: string;
+  isUserProfileComplete: boolean;
 }
 
-const EventFormActions = ({ isSubmitting, userCredits = 0, formType }: EventFormActionsProps) => {
+const EventFormActions = ({ isSubmitting, userCredits = 0, formType,isUserProfileComplete }: EventFormActionsProps) => {
   const hasEnoughCredits = userCredits >= EVENT_SUBMISSION_COST;
   
   return (
@@ -17,7 +18,7 @@ const EventFormActions = ({ isSubmitting, userCredits = 0, formType }: EventForm
       <Button 
         type="submit" 
         className="w-full bg-travel-500 hover:bg-travel-600"
-        disabled={isSubmitting || !hasEnoughCredits}
+        disabled={isSubmitting || !hasEnoughCredits || !isUserProfileComplete}
       >
         {isSubmitting ? (
           <>
