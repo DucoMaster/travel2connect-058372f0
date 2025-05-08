@@ -38,12 +38,10 @@ const PackageDetail = () => {
   const [showQRCodeDialog, setShowQRCodeDialog] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [bookingCount, setBookingCount] = useState<number>(0);
-
+  const [loading, setLoading] = useState(false);
   // const pkg = packages.find((p) => p.id === id);
   const { data: pkg, isLoading, error } = useEventPackageById(id);
-
   const isOwner = user && user?.id === pkg?.creator_id;
-
   const handleCapacity = async () => {
     const { count, error } = await supabase
       .from("event_package_booking")
@@ -57,13 +55,70 @@ const PackageDetail = () => {
       setBookingCount(count ?? 0);
     }
   };
-
   useEffect(() => {
     if (pkg?.id) {
       handleCapacity();
     }
   }, [pkg?.id]);
 
+  const handleCheckout = async (formattedDates: string) => {
+    try {
+      setLoading(true);
+      const sessionResult = await supabase.auth.getSession();
+      // Check if session data exists and if there's a valid access_token
+      const accessToken = sessionResult.data?.session?.access_token;
+
+      if (!accessToken) {
+        throw new Error("User is not authenticated.");
+      }
+      const products = [
+        {
+          name: pkg.id, // Use the selected tier name here
+          price: pkg.price * 100, // Convert price to cents (Stripe expects amounts in cents)
+          quantity: 1, // You can modify this based on the selected quantity
+        },
+      ];
+      const response = await fetch(
+        "https://lmwbccidogskuqsmqgtp.supabase.co/functions/v1/topup-stripe",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            originUrl: window.location.origin, // or a custom URL if needed
+            products, // Include the products array in the payload
+            userId: user?.id || 0,
+            credits: pkg?.price || 0,
+            pkgId: pkg.id,
+            booking_dates: formattedDates,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Something went wrong.");
+      }
+
+      if (data.url) {
+        window.location.href = data.url; // Redirect to Stripe checkout
+      } else {
+        throw new Error("Stripe session URL missing.");
+      }
+    } catch (error) {
+      console.error("Payment error:", error);
+      toast({
+        title: "Payment error",
+        description: "There was an error initiating the payment process.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
   const handleApply = async (bookingDates: string[]) => {
     if (!user || !pkg?.id) return;
 
@@ -80,30 +135,24 @@ const PackageDetail = () => {
         .select("id, booking_dates")
         .eq("user_id", user.id)
         .eq("event_package_id", pkg.id);
-
       if (bookingCheckError) throw bookingCheckError;
-
       const allExistingDates = new Set(
         (existingBooking || [])
           .flatMap((b) => b.booking_dates || [])
           .map((d: string) => new Date(d).getTime())
       );
-
       const overlapping = formattedDates.filter((dateStr) =>
         allExistingDates.has(new Date(dateStr).getTime())
       );
-
       if (overlapping.length > 0) {
         const formatted = overlapping
           .map((d) => new Date(d))
           .sort((a, b) => a.getTime() - b.getTime());
-
         const days = formatted.map((d) => d.getDate()).join(", ");
         const monthYear = formatted[0].toLocaleDateString("en-US", {
           month: "long",
           year: "numeric",
         });
-
         toast({
           title: "Booking Exists",
           description: `You've already applied to guide for ${pkg.title} on ${days} ${monthYear}. Please choose different date(s).`,
@@ -116,51 +165,52 @@ const PackageDetail = () => {
 
       // 2. Check if the user has enough credits
       if (user.credits >= pkg.price) {
+        await handleCheckout(JSON.stringify(formattedDates));
         // Update the user's credits
-        const { error: creditError } = await supabase
-          .from("profiles")
-          .update({ credits: user.credits - pkg.price })
-          .eq("id", user.id);
+        // const { error: creditError } = await supabase
+        //   .from("profiles")
+        //   .update({ credits: user.credits - pkg.price })
+        //   .eq("id", user.id);
 
-        if (creditError) throw new Error(creditError.message);
+        // if (creditError) throw new Error(creditError.message);
 
-        // 3. Create a booking in event_package_booking
-        const { error: bookingError } = await supabase
-          .from("event_package_booking")
-          .insert({
-            user_id: user.id,
-            event_package_id: pkg.id,
-            booking_dates: formattedDates as unknown as string,
-          });
+        // // 3. Create a booking in event_package_booking
+        // const { error: bookingError } = await supabase
+        //   .from("event_package_booking")
+        //   .insert({
+        //     user_id: user.id,
+        //     event_package_id: pkg.id,
+        //     booking_dates: formattedDates as unknown as string,
+        //   });
 
-        if (bookingError) throw new Error(bookingError.message);
+        // if (bookingError) throw new Error(bookingError.message);
 
         // Update the user state after booking
-        const updatedUser = {
-          ...user,
-          credits: user.credits - pkg.price,
-        };
-        setUser(updatedUser);
-        localStorage.setItem("traveler-user", JSON.stringify(updatedUser));
+        // const updatedUser = {
+        //   ...user,
+        //   credits: user.credits - pkg.price,
+        // };
+        // setUser(updatedUser);
+        // localStorage.setItem("traveler-user", JSON.stringify(updatedUser));
 
         // Show success notification
-        toast({
-          title: "Application Submitted",
-          description: `You've applied to guide for ${pkg.title}.`,
-        });
-        await fetch(`${EMAIL_SERVER_URL}/api/email/send`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            title: pkg.title,
-            start: pkg.start_date,
-            end: pkg.end_date,
-            booking_dates: formattedDates,
-          }),
-        });
-        setShowApplyDialog(false);
+        // toast({
+        //   title: "Application Submitted",
+        //   description: `You've applied to guide for ${pkg.title}.`,
+        // });
+        // await fetch(`${EMAIL_SERVER_URL}/api/email/send`, {
+        //   method: "POST",
+        //   headers: {
+        //     "Content-Type": "application/json",
+        //   },
+        //   body: JSON.stringify({
+        //     title: pkg.title,
+        //     start: pkg.start_date,
+        //     end: pkg.end_date,
+        //     booking_dates: formattedDates,
+        //   }),
+        // });
+        // setShowApplyDialog(false);
         navigate("/");
       } else {
         toast({

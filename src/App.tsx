@@ -21,6 +21,7 @@ import Success from "./pages/Payment/success";
 import PackageNotFound from "./components/package/PackageNotFound";
 import PaymentError from "./pages/Payment/error";
 import EventCheckIn from "./pages/EventCheckIn";
+import SuccessEventPayment from "./pages/Payment/success-topup";
 
 // Auth route guard for private routes
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -81,6 +82,14 @@ const App = () => {
                 element={
                   <ProtectedRoute>
                     <Success />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/successTopUp"
+                element={
+                  <ProtectedRoute>
+                    <SuccessEventPayment />
                   </ProtectedRoute>
                 }
               />
