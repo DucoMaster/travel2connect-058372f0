@@ -164,61 +164,61 @@ const PackageDetail = () => {
       }
 
       // 2. Check if the user has enough credits
-      if (user.credits >= pkg.price) {
-        await handleCheckout(JSON.stringify(formattedDates));
-        // Update the user's credits
-        // const { error: creditError } = await supabase
-        //   .from("profiles")
-        //   .update({ credits: user.credits - pkg.price })
-        //   .eq("id", user.id);
+      // if (user.credits >= pkg.price) {
+      await handleCheckout(JSON.stringify(formattedDates));
+      // Update the user's credits
+      // const { error: creditError } = await supabase
+      //   .from("profiles")
+      //   .update({ credits: user.credits - pkg.price })
+      //   .eq("id", user.id);
 
-        // if (creditError) throw new Error(creditError.message);
+      // if (creditError) throw new Error(creditError.message);
 
-        // // 3. Create a booking in event_package_booking
-        // const { error: bookingError } = await supabase
-        //   .from("event_package_booking")
-        //   .insert({
-        //     user_id: user.id,
-        //     event_package_id: pkg.id,
-        //     booking_dates: formattedDates as unknown as string,
-        //   });
+      // // 3. Create a booking in event_package_booking
+      // const { error: bookingError } = await supabase
+      //   .from("event_package_booking")
+      //   .insert({
+      //     user_id: user.id,
+      //     event_package_id: pkg.id,
+      //     booking_dates: formattedDates as unknown as string,
+      //   });
 
-        // if (bookingError) throw new Error(bookingError.message);
+      // if (bookingError) throw new Error(bookingError.message);
 
-        // Update the user state after booking
-        // const updatedUser = {
-        //   ...user,
-        //   credits: user.credits - pkg.price,
-        // };
-        // setUser(updatedUser);
-        // localStorage.setItem("traveler-user", JSON.stringify(updatedUser));
+      // Update the user state after booking
+      // const updatedUser = {
+      //   ...user,
+      //   credits: user.credits - pkg.price,
+      // };
+      // setUser(updatedUser);
+      // localStorage.setItem("traveler-user", JSON.stringify(updatedUser));
 
-        // Show success notification
-        // toast({
-        //   title: "Application Submitted",
-        //   description: `You've applied to guide for ${pkg.title}.`,
-        // });
-        // await fetch(`${EMAIL_SERVER_URL}/api/email/send`, {
-        //   method: "POST",
-        //   headers: {
-        //     "Content-Type": "application/json",
-        //   },
-        //   body: JSON.stringify({
-        //     title: pkg.title,
-        //     start: pkg.start_date,
-        //     end: pkg.end_date,
-        //     booking_dates: formattedDates,
-        //   }),
-        // });
-        // setShowApplyDialog(false);
-        navigate("/");
-      } else {
-        toast({
-          title: "Application Failed",
-          description: `You don't have enough credits to apply (${pkg.price} credits required).`,
-          variant: "destructive",
-        });
-      }
+      // Show success notification
+      // toast({
+      //   title: "Application Submitted",
+      //   description: `You've applied to guide for ${pkg.title}.`,
+      // });
+      // await fetch(`${EMAIL_SERVER_URL}/api/email/send`, {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({
+      //     title: pkg.title,
+      //     start: pkg.start_date,
+      //     end: pkg.end_date,
+      //     booking_dates: formattedDates,
+      //   }),
+      // });
+      // setShowApplyDialog(false);
+      // navigate("/");
+      // } else {
+      //   toast({
+      //     title: "Application Failed",
+      //     description: `You don't have enough credits to apply (${pkg.price} credits required).`,
+      //     variant: "destructive",
+      //   });
+      // }
     } catch (err: any) {
       toast({
         title: "Something went wrong",
